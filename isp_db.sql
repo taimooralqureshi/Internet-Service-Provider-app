@@ -374,7 +374,8 @@ SELECT
 FROM
     customer c
         JOIN
-    service s ON c.id = s.id
+    service s
+    group by c.id
 order by c.id;
 	
 
