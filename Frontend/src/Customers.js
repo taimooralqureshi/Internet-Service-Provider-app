@@ -27,9 +27,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             console.log(res);
             return res.json()
          })
-        .then(services => { 
-            console.log(services); 
-            this.setState({ customers: services })
+        .then(customers => { 
+            console.log(customers); 
+            this.setState({ customers: customers })
          })
           .catch(err => console.error(err));
       };
@@ -110,7 +110,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 <td>{this.state.customers[i]['name']}</td>
                 <td>{this.state.customers[i]['contact']}</td>
                 <td>{this.state.customers[i][3]}</td>
-                <td>{this.state.customers[i][4]}</td>
+                <td>{this.state.customers[i]['subscription']}</td>
                 <td>{this.state.customers[i][5]}</td>
                 <td><a href="#" onClick={() =>
                   {
