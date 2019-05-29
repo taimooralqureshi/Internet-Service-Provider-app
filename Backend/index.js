@@ -5,7 +5,7 @@ const mysql = require('mysql');
 const SERVICE_QUERY = "SELECT * FROM service";
 const DEVICE_QUERY = "SELECT * FROM device";
 
-const CUSTOMER_QUERY = "CALL customer_data()";
+
 
 const app = express();
 const connection = mysql.createConnection({
@@ -75,16 +75,17 @@ app.get('/devices/:id', function (req, res) {
 
 
 app.get('/customers', (req,res) => {
-    connection.query(CUSTOMER_QUERY, (err, result) => {
+    connection.query('CALL customers_data()', (err, result) => {
         if (err) throw err;
         else
-          return res.json({result})
+          return res.json(result[0])
     });
 });
 
 app.get('/customers/:id', function (req, res) {
     let id = req.params.id;
-    connection.query("call customer("+id+")", id, (err, result) => {
+        
+    connection.query("call customer_data(?)",id, (err, result) => {
         if (err) throw err;
         else
           return res.json(result[0])
