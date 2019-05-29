@@ -1,0 +1,84 @@
+body{
+  background-image:url("light1.png");
+  background-size: cover;
+}
+
+#navbar .nav{
+  background-color: #34444c;
+  padding-top: 25px;
+  position: fixed;
+  height: 100%;
+  border-right: 2px solid #ec9941;
+}
+
+#navbar .navbar-max{
+  width: 200px;
+}
+
+#navbar .navbar-min{
+  width: 50px;
+}
+
+#navbar a{
+  display: block;
+  color: gainsboro;
+  text-decoration: none;
+  margin-left: 15px;
+  font-size: 16px;
+}
+
+#navbar a:hover, #navbar .icon:hover{
+  color: white;
+}
+
+#navbar .icon{
+  color: gainsboro;
+  margin-right: 15px;
+  font-size: 20px;
+}
+
+.pageMargin{
+  margin-left: 200px;
+  padding: 1% 3%;
+}
+
+Table{
+  width: 90%;
+  margin: auto;
+  margin-top: 30px;
+}
+
+Table>tbody>tr:nth-child(even)>td,
+.table-striped>tbody>tr:nth-child(even)>th {
+   background-color: white;
+}
+
+Table a{
+ color: black;
+ text-decoration: none;
+}
+
+#addBtn{
+  float: left;
+  margin: 10px 0 0 50px;
+  padding: 5px 30px;
+  background-color: #ec9941;
+  color: white;
+  border: 1px solid #ec9941;
+  border-radius: 25px;
+}
+
+#addBtn:hover{
+  background-color: #e76229;
+  border: 1px solid #e76229;
+}
+
+.icon{
+  color: red;
+}
+
+@media screen and (max-width: 600px){
+  .pageMargin{
+    margin-left: 50px;
+  }
+}
