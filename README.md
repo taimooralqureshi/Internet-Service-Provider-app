@@ -14,3 +14,65 @@
 ## step-3
 	Then Run React App
 	
+
+## All Possible Routes
+	Customers
+
+*GET*
+> customers/
+
+*GET*
+> customers/id
+
+*GET*
+> customers/raw/
+
+*GET*
+> customers/raw/id
+
+*POST*
+> customers/
+
+*PUT*
+> customers/id
+
+*DELETE*
+> customers/id
+<hr>
+
+	Devices
+
+*GET*
+> devices/
+
+*GET*
+> devices/id
+
+*POST*
+> devices/
+
+*PUT*
+> devices/id
+
+*DELETE*
+> devices/id
+
+<hr>
+
+	Services
+
+*GET*
+> services/
+
+*GET*
+> services/id
+
+*POST*
+> services/
+
+*PUT*
+> services/id
+
+*DELETE*
+> services/id
+

@@ -2,33 +2,17 @@ drop database if exists isp_db;
 create database if not exists ISP_DB;
 use isp_db;
 
-/*
-drop table if exists person;
-CREATE TABLE person (
-    id INT PRIMARY KEY auto_increment,
-    name VARCHAR(50) NOT NULL,
-    contact VARCHAR(13),
-    address VARCHAR(255)
-);
-*/
-/*    
-drop table if exists type_of_service; 
-CREATE TABLE type_of_service (
-    name VARCHAR(12) PRIMARY KEY
-); 
-insert into type_of_service(name) values ("Wifi"),("Broadband");
-select * from type_of_service;
-*/
+
 drop table if exists device;    
 
 create table device(
 	id int primary key auto_increment,
-    name varchar(50) not null unique key,
+    device varchar(50) not null unique key,
     price int not null,
     description varchar(255)
 );
 
-insert into device (name, price, description) values
+insert into device (device, price, description) values
 ("D-SIM", 200, "data sim"),
 ("D-USB", 500, "data usb without wifi"),
 ("DW-USB", 1000, "data usb with 3G wifi,upt0 3 user connection limit"),
@@ -50,7 +34,7 @@ FROM
 drop table if exists sevice;    
 create table service(
 	id int primary key auto_increment,
-    name varchar(50) unique key ,
+    service varchar(50) unique key ,
 	data varchar(7) not null,
     validity varchar(15) not null,
     speed varchar(10) not null,
@@ -58,7 +42,7 @@ create table service(
    price int not null
 );
     
-insert into service (type ,data , validity, speed, price, name )  values
+insert into service (type ,data , validity, speed, price, service )  values
 ("Data","10GB", "1 Day" , "24MBps", 100,'Data 10'),
 ("Data","20GB", "3 Day", "24MBps", 190, 'Data 20'),
 ("Data","50GB", "10 Day", "24MBps", 480, 'Data 50'),
@@ -324,8 +308,8 @@ select * from customer;
 
 
 
-drop procedure customer_data;
-
+drop procedure if exists customer_data;
+call customer_data(7);
 DELIMITER $$
 CREATE PROCEDURE customer_data(id int)
 BEGIN        
@@ -336,30 +320,25 @@ SELECT
     c.contact,
     c.address,
     c.status,
-    s.name as subscription,
+    s.service as subscription,
     s.data AS volume,
     s.validity,
     s.speed,
     s.type as type_of_service,
-    s.price as flat_charges,
-    d.name as device,
-    d.price as device_price,
-    d.description
+    s.price as flat_charges
 FROM
     customer c
-        JOIN
-    service s ON c.id = s.id
-		join
-	device d on c.id = d.id
-where c.id = id;
-	
-
+	left join
+    service s ON c.service_id = s.id 
+	where c.id = id  
+     
+     group by c.id;
 END$$ 
 DELIMITER ;
 
-call customer_data(7);
 
-drop procedure customers_data;
+
+drop procedure if exists customers_data;
 
 DELIMITER $$
 CREATE PROCEDURE customers_data()
@@ -370,13 +349,13 @@ SELECT
     c.name,
     c.contact,
     c.status,
-    s.name as subscription
+    s.service
 FROM
     customer c
         JOIN
-    service s
+    service s on s.id = c.service_id
     group by c.id
-order by c.id;
+	order by c.id;
 	
 
 END$$ 
