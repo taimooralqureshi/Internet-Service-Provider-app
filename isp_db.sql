@@ -1,3 +1,5 @@
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+
 drop database if exists isp_db;
 create database if not exists ISP_DB;
 use isp_db;
@@ -309,7 +311,6 @@ select * from customer;
 
 
 drop procedure if exists customer_data;
-call customer_data(7);
 DELIMITER $$
 CREATE PROCEDURE customer_data(id int)
 BEGIN        
@@ -320,22 +321,24 @@ SELECT
     c.contact,
     c.address,
     c.status,
-    s.service as subscription,
-    s.data AS volume,
-    s.validity,
-    s.speed,
-    s.type as type_of_service,
-    s.price as flat_charges
+    s.service as s_name,
+    s.validity AS s_validity,
+    s.data AS s_volume,
+    s.speed AS s_speed,
+    s.price as s_price,
+    s.type as s_type,
+    d.device as d_name,
+    d.description as d_description,
+    d.price as d_price
 FROM
     customer c
-	left join
-    service s ON c.service_id = s.id 
-	where c.id = id  
-     
-     group by c.id;
+	join service s ON c.service_id = s.id 
+    join device d on c.device_id=d.id
+	group by c.id;
 END$$ 
 DELIMITER ;
 
+call customer_data(7);
 
 
 drop procedure if exists customers_data;
@@ -348,17 +351,44 @@ SELECT
     c.id,
     c.name,
     c.contact,
+    c.address,
     c.status,
-    s.service
+    s.service as s_name,
+    s.validity AS s_validity,
+    s.data AS s_volume,
+    s.speed AS s_speed,
+    s.price as s_price,
+    s.type as s_type,
+    d.device as d_name,
+    d.description as d_description,
+    d.price as d_price
 FROM
     customer c
-        JOIN
-    service s on s.id = c.service_id
-    group by c.id
-	order by c.id;
-	
-
+    join service s ON c.service_id = s.id 
+    join device d on c.device_id=d.id
+	group by c.id;
 END$$ 
 DELIMITER ;
 
 call customers_data();
+
+SELECT 
+    c.id,
+    c.name,
+    c.contact,
+    c.address,
+    c.status,
+    s.service as s_name,
+    s.validity AS s_validity,
+    s.data AS s_volume,
+    s.speed AS s_speed,
+    s.price as s_price,
+    s.type as s_type,
+    d.device as d_name,
+    d.description as d_description,
+    d.price as d_price
+FROM
+    customer c
+    left outer join service s ON c.service_id = s.id 
+    left outer join device d on c.device_id=d.id or c.device_id=null
+	group by c.id;
