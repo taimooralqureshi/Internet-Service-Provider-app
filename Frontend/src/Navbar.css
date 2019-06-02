@@ -46,7 +46,7 @@ Table{
   width: 90%;
   margin: auto;
   margin-top: 30px;
-}
+} 
 
 Table>tbody>tr:nth-child(even)>td,
 .table-striped>tbody>tr:nth-child(even)>th {
@@ -81,4 +81,22 @@ Table a{
   .pageMargin{
     margin-left: 50px;
   }
+}
+
+.detailsModal span{
+  font-weight: bold;
+}
+
+#detailModalHeading{
+  color: #ec9941;
+  font-weight: 600;
+  font-size: 25px;
+  padding-bottom: 10px;
+}
+
+#detailModalSubHeading{
+  color: #ec9941;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 10px 0;
 }
