@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       this.state={
         customers:[],
         name:'', contact:'', sub:'', device:'', err:'', sno:1, detail: {},
-        showPopup:false, showDetails:false, deviceDetails:true
+        showPopup:false, showDetails:false, deviceDetails:false
       };
     }
 
@@ -53,18 +53,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     showDetails=(item)=> {
       this.setState({
         showDetails: true,
-        detail :item
+        detail :item,
+        deviceDetails :  item.d_name !== null
       });
     }
 
-    isDeviceDetails=()=>{
-      if(this.state.detail['d_name']=='')
-      {
-        this.setState({
-          deviceDetails:false
-        });
-      }
-    }
+
 
     change = e => {
       this.setState({
@@ -154,7 +148,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <div><span>Flat Price : </span>{this.state.detail['s_price']}Rs</div>
               <hr style={{color:"#ec9941", marginTop:"20px"}}/>
               <div id="detailModalSubHeading">Device Details</div>
-              {this.isDeviceDetails}
+    
               {this.state.deviceDetails && <div><span>Device Name : </span>{this.state.detail['d_name']}</div>}
               {this.state.deviceDetails && <div><span>Description : </span>{this.state.detail['d_description']}</div>}
               {this.state.deviceDetails && <div><span>Price : </span>{this.state.detail['d_price']}Rs.</div>}
