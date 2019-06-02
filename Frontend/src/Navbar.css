@@ -29,6 +29,7 @@ body{
 
 #navbar a:hover, #navbar .icon:hover{
   color: white;
+  cursor: pointer;
 }
 
 #navbar .icon{
@@ -46,11 +47,16 @@ Table{
   width: 90%;
   margin: auto;
   margin-top: 30px;
-} 
+}
 
 Table>tbody>tr:nth-child(even)>td,
 .table-striped>tbody>tr:nth-child(even)>th {
-   background-color: white;
+  background-color: white;
+}
+
+#customers Table>tbody>tr:nth-child(even)>td:hover, #customers  Table>tbody>tr:hover {
+  cursor: pointer;
+  background-color: white;
 }
 
 Table a{
