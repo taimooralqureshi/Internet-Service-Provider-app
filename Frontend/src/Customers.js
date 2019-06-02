@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       super(props);
       this.state={
         customers:[],
-        name:'', contact:'', sub:'', device:'', err:'', sno:1,
-        showPopup:false, subcriptionDetails:false, deviceDetails:false
+        name:'', contact:'', sub:'', device:'', err:'', sno:1, detail: {},
+        showPopup:false, subscriptionDetails:false, deviceDetails:false
       };
     }
 
@@ -52,18 +52,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     closeSubscription=()=> {
       this.setState({ subscriptionDetails: false });
+      detail : {}
     }
 
-    showSubscription=()=> {
-      this.setState({ subscriptionDetails: true });
+    showSubscription=(item)=> {
+      this.setState({ subscriptionDetails: true ,
+      detail :item
+      });
     }
 
     closeDevices=()=> {
-      this.setState({ deviceDetails: false });
+      this.setState({ deviceDetails: false,
+      detail : {}
+    });
     }
 
-    showDevices=()=> {
-      this.setState({ deviceDetails: true });
+    showDevices=(item)=> {
+      this.setState({ deviceDetails: true,
+      detail :item
+    });
     }
 
     change = e => {
@@ -120,23 +127,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           {
               this.state.customers.map((item, i) => (
               <tr key={i}>
-                <td>{this.state.customers[i]['id']}</td>
-                <td>{this.state.customers[i]['name']}</td>
-                <td>{this.state.customers[i]['contact']}</td>
-                <td><a href="#" onClick={this.showSubscription}>{this.state.customers[i]['s_name']}</a><br/></td>
+                <td>{item.id}</td>
+                <td>{item.name}</td>
+                <td>{item.contact}</td>
+                <td><a href="#" onClick={() => this.showSubscription(item) }>{item.s_name}</a><br/></td>
                 {
                   // Subscription Details model
                 }
-                <Modal size="sm" show={this.state.subcriptionDetails} onHide={this.closeSubscription}>
+                <Modal size="sm" show={this.state.subscriptionDetails} onHide={this.closeSubscription}>
                   <Modal.Header closeButton>
-                    <Modal.Title>{this.state.customers[i]['s_name']}</Modal.Title>
+                    <Modal.Title>{this.state.detail['s_name']}</Modal.Title>
                   </Modal.Header>
                   <Modal.Body>
-                    <div>{this.state.customers[i]['s_validity']}</div>
-                    <div>{this.state.customers[i]['s_volume']}</div>
-                    <div>{this.state.customers[i]['s_speed']}</div>
-                    <div>{this.state.customers[i]['s_price']}</div>
-                    <div>{this.state.customers[i]['s_type']}</div>
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Type : </span>{this.state.detail['s_type']}</div>
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Validity : </span>{this.state.detail['s_validity']}</div>
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Volume Usage : </span>{this.state.detail['s_volume']}</div>
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Speed Upto : </span>{this.state.detail['s_speed']}</div>
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Flat Price : </span>{this.state.detail['s_price']}Rs</div>
                   </Modal.Body>
                   <Modal.Footer>
                     <Button variant="secondary" onClick={this.closeSubscription}>Close</Button>
@@ -149,22 +156,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                     // {this.state.customers[i]['s_price']}<br/>
                     // {this.state.customers[i]['s_type']}</td>
                 }
-                <td><a href="#" onClick={this.showDevices}>{this.state.customers[i]['d_name']}</a><br/></td>
+                <td><a href="#" onClick={() => this.showDevices(item)}>{item.d_name}</a><br/></td>
                 {
                   // Device Details model
                 }
+                
                 <Modal size="sm" show={this.state.deviceDetails} onHide={this.closeDevices}>
                   <Modal.Header closeButton>
-                    <Modal.Title>{this.state.customers[i]['d_name']}</Modal.Title>
+                    <Modal.Title>{this.state.detail['d_name']}</Modal.Title>
                   </Modal.Header>
                   <Modal.Body>
-                    <div>{this.state.customers[i]['d_description']}</div>
-                    <div>{this.state.customers[i]['d_price']}</div>
+                    
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Description : </span></div>
+                    <div>{this.state.detail['d_description']}</div>
+                    <div><span style={{color : "orange", fontWeight : "bold"}}>Price : </span>{this.state.detail['d_price']}Rs.</div>
                   </Modal.Body>
                   <Modal.Footer>
                     <Button variant="secondary" onClick={this.closeDevices}>Close</Button>
                   </Modal.Footer>
                 </Modal>
+                
                 {
                     // {this.state.customers[i]['d_description']}<br/>
                     // {this.state.customers[i]['d_price']}</td>
