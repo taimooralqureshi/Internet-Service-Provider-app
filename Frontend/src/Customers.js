@@ -31,8 +31,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     componentDidMount(){
       this.getCustomers();
-      console.log(this.setState);
-
     }
 
     getCustomers = _ =>{
@@ -47,23 +45,44 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     };
     
     
+    deleteCustomer = id =>{
+      fetch('http://localhost:4000/customers/'+id,{method : 'DELETE'})
+      .then(res => {
+        return res.status(200);
+     })
+    .catch(err => console.error(err));
+  };
   
+  addCustomer = customer =>
+    {
+      console.log(customer);
+      
+      fetch('http://localhost:4000/customers/',{
+        method : 'POST',
+        headers: {'Content-Type':'application/json'},
+        body : JSON.stringify(customer)
+        
+    })  
+    .then(res => {
+      return res.json();
+   })
+   .catch(err => console.error(err));
+  };
 
     expiryDateAndStatusUpdate=(item)=> {
      let date = new Date(item.active_date)
-      let expiryDate = "UnKnown Activation Date";
+      // let expiryDate = "UnKnown Activation Date";
       
-      if (item.s_validity.toLowerCase().search('month') !== -1)
-           expiryDate = date.addMonths(item.s_validity.split(' ')[0]);          
-      else if (item.s_validity.toLowerCase().search('day') !== -1)
-           expiryDate = date.addDays(item.s_validity.split(' ')[0]);    
+      // if (item.s_validity.toLowerCase().search('month') !== -1)
+      //      expiryDate = date.addMonths(item.s_validity.split(' ')[0]);          
+      // else if (item.s_validity.toLowerCase().search('day') !== -1)
+      //      expiryDate = date.addDays(item.s_validity.split(' ')[0]);    
 
-        item['exp'] = expiryDate;
-      if(expiryDate >= Date.now())
-          item.status = "Active";
-        else 
-        item.status = "Deactive";
-      console.log(item.status);
+      //   item['exp'] = expiryDate;
+      // if(expiryDate >= Date.now())
+      //     item.status = "Active";
+      //   else 
+      //   item.status = "Deactive";
                   
     };
 
@@ -113,12 +132,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           device : '',
           err: ''
         });
+        
+        var custom_customer = {
+          "name": "Taimoor Qureshi",
+          "contact" : "0348-464-2025",
+          "service_id" : 5,
+          "device_id" : 5,
+          "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/') 
+          
+        }
+
+        this.addCustomer(custom_customer);
       }
     };
 
     //rows: array from which element is to be deleted
-    delete = (index, rows) => {
+    delete = (index, rows,item) => {
       rows.splice(index,1);
+      this.deleteCustomer(item.id)
     };
 
     render(){
@@ -155,7 +186,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 <td><a href="#" onClick={() =>
                   {
                     if (window.confirm('Are you sure you wish to delete this item?'))
-                      this.delete(i, this.state.customers) }
+                      this.delete(i, this.state.customers,item) }
                   }>
                   <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"40%"}} /></a>
                 </td>
