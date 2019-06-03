@@ -2,13 +2,27 @@ import React, { Component } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+   Date.prototype.addDays = function(days) {
+      var date = new Date(this.valueOf());
+      date.setTime(date.getTime() + days* 24 * 60 * 60 * 1000);
+      return date;
+    }
+    Date.prototype.addMonths = function (m) {
+      var d = new Date(this);
+      var years = Math.floor(m / 12);
+      var months = m - (years * 12);
+      if (years) d.setFullYear(d.getFullYear() + years);
+      if (months) d.setMonth(d.getMonth() + months);
+      return d;
+  }
+
   class Customers extends Component{
     constructor(props){
       super(props);
       this.state={
         customers:[],
         name:'', contact:'', sub:'', device:'', err:'', sno:1, detail: {},
-        showPopup:false, showDetails:false, deviceDetails:false
+        showPopup:false, showDetails:false, deviceDetails:true
       };
     }
 
@@ -16,25 +30,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
     componentDidMount(){
-      this.getServices();
+      this.getCustomers();
       console.log(this.setState);
 
     }
 
-    getServices = _ =>{
+    getCustomers = _ =>{
         fetch('http://localhost:4000/customers')
         .then(res => {
-          console.log(res);
           return res.json()
        })
       .then(customers => {
-          console.log(customers);
           this.setState({ customers: customers })
        })
         .catch(err => console.error(err));
     };
+    
+    
+  
 
+    expiryDateAndStatusUpdate=(item)=> {
+     let date = new Date(item.active_date)
+      let expiryDate = "UnKnown Activation Date";
+      
+      if (item.s_validity.toLowerCase().search('month') !== -1)
+           expiryDate = date.addMonths(item.s_validity.split(' ')[0]);          
+      else if (item.s_validity.toLowerCase().search('day') !== -1)
+           expiryDate = date.addDays(item.s_validity.split(' ')[0]);    
 
+        item['exp'] = expiryDate;
+      if(expiryDate >= Date.now())
+          item.status = "Active";
+        else 
+        item.status = "Deactive";
+      console.log(item.status);
+                  
+    };
 
 
     handleClose=()=> {
@@ -54,12 +85,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       this.setState({
         showDetails: true,
         detail :item,
-        deviceDetails :  item.d_name !== null
+        deviceDetails : item.d_name !== null
       });
     }
 
-
-
+    
     change = e => {
       this.setState({
         [e.target.name]: e.target.value
@@ -107,6 +137,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 <th style={{width:"103px"}}>Customer Id</th>
                 <th>Name</th>
                 <th>Contact</th>
+                <th>Subscription</th>
+                <th>Status</th>
                 <th style={{width:"50px"}}>Remove</th>
               </tr>
             </thead>
@@ -114,9 +146,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             {
               this.state.customers.map((item, i) => (
               <tr onClick={() => this.showDetails(item)} key={i}>
+                  {this.expiryDateAndStatusUpdate(item)}
                 <td>{item.id}</td>
                 <td>{item.name}</td>
                 <td>{item.contact}</td>
+                <td>{item.s_name}</td>
+                <td>{item.status}</td>
                 <td><a href="#" onClick={() =>
                   {
                     if (window.confirm('Are you sure you wish to delete this item?'))
@@ -148,7 +183,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <div><span>Flat Price : </span>{this.state.detail['s_price']}Rs</div>
               <hr style={{color:"#ec9941", marginTop:"20px"}}/>
               <div id="detailModalSubHeading">Device Details</div>
-    
+
               {this.state.deviceDetails && <div><span>Device Name : </span>{this.state.detail['d_name']}</div>}
               {this.state.deviceDetails && <div><span>Description : </span>{this.state.detail['d_description']}</div>}
               {this.state.deviceDetails && <div><span>Price : </span>{this.state.detail['d_price']}Rs.</div>}
