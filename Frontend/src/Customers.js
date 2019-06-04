@@ -20,8 +20,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     constructor(props){
       super(props);
       this.state={
-        customers:[],
-        name:'', contact:'', sub:'', device:'', err:'', sno:1, detail: {},
+        customers:[], devices:[], services:[],
+        name:'', contact:'', address:'', sub:'', device:'', err:'', sno:1, detail: {},
         showPopup:false, showDetails:false, deviceDetails:true
       };
     }
@@ -31,6 +31,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     componentDidMount(){
       this.getCustomers();
+      this.getDevices();
+      this.getServices();
     }
 
     getCustomers = _ =>{
@@ -43,8 +45,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
        })
         .catch(err => console.error(err));
     };
-    
-    
+
+    getDevices = _ =>{
+        fetch('http://localhost:4000/devices')
+        .then(res => {
+          return res.json()
+       })
+      .then(devices => {
+          this.setState({ devices: devices })
+       })
+        .catch(err => console.error(err));
+    };
+
+    getServices = _ =>{
+        fetch('http://localhost:4000/services')
+        .then(res => {
+          return res.json()
+       })
+      .then(services => {
+          this.setState({ services: services })
+       })
+        .catch(err => console.error(err));
+    };
+
+
     deleteCustomer = id =>{
       fetch('http://localhost:4000/customers/'+id,{method : 'DELETE'})
       .then(res => {
@@ -52,17 +76,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
      })
     .catch(err => console.error(err));
   };
-  
+
   addCustomer = customer =>
     {
       console.log(customer);
-      
+
       fetch('http://localhost:4000/customers/',{
         method : 'POST',
         headers: {'Content-Type':'application/json'},
         body : JSON.stringify(customer)
-        
-    })  
+
+    })
     .then(res => {
       return res.json();
    })
@@ -72,18 +96,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     expiryDateAndStatusUpdate=(item)=> {
      let date = new Date(item.active_date)
       // let expiryDate = "UnKnown Activation Date";
-      
+
       // if (item.s_validity.toLowerCase().search('month') !== -1)
-      //      expiryDate = date.addMonths(item.s_validity.split(' ')[0]);          
+      //      expiryDate = date.addMonths(item.s_validity.split(' ')[0]);
       // else if (item.s_validity.toLowerCase().search('day') !== -1)
-      //      expiryDate = date.addDays(item.s_validity.split(' ')[0]);    
+      //      expiryDate = date.addDays(item.s_validity.split(' ')[0]);
 
       //   item['exp'] = expiryDate;
       // if(expiryDate >= Date.now())
       //     item.status = "Active";
-      //   else 
+      //   else
       //   item.status = "Deactive";
-                  
+
     };
 
 
@@ -108,38 +132,66 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       });
     }
 
-    
+
     change = e => {
       this.setState({
         [e.target.name]: e.target.value
       });
     };
 
+    findServiceId = name => {
+      for(let i=0; i<this.state.services.length; i++){
+        if(this.state.services['service']==name)
+          return this.state.services['id'];
+      }
+    };
+
+    findDeviceId = name => {
+      for(let i=0; i<this.state.devices.length; i++){
+        if(this.state.devices['device']==name)
+          return this.state.devices['id'];
+      }
+    };
+
     add = states => {
       let row = this.state.customers;
-      if(states.name==='' || states.contact==='' || states.sub==='' || states.device===''){
+      if(states.name==='' || states.contact==='' || states.address==='' || states.sub==='' || states.device===''){
         this.setState({
           err : 'empty field!'
         });
       }
       else{
-        row.push([states.sno++, states.name, states.contact, states.sub, states.device]);
+        states.sub=this.findServiceId(states.sub);
+        states.device=this.findDeviceId(states.device);
+        row.push([states.sno++, states.name, states.contact, states.address, states.sub, states.device]);
+
+        var custom_customer = {
+          "name": states.name,
+          "contact" : states.contact,
+          "address" : states.address,
+          "service_id" : states.sub,
+          "device_id" : states.device,
+          "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
+        }
+
         this.setState({
           customers : row,
           name : '',
           contact : '',
+          address : '',
           sub : '',
           device : '',
           err: ''
         });
-        
-        var custom_customer = {
-          "name": "Taimoor Qureshi",
-          "contact" : "0348-464-2025",
-          "service_id" : 5,
-          "device_id" : 5,
-          "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/') 
-          
+
+        {
+        //   var custom_customer = {
+        //   "name": "Taimoor Qureshi",
+        //   "contact" : "0348-464-2025",
+        //   "service_id" : 5,
+        //   "device_id" : 5,
+        //   "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
+        // }
         }
 
         this.addCustomer(custom_customer);
@@ -238,11 +290,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <td><input type="text" name="name" value={this.state.name} onChange={e => this.change(e)}/></td>
               <label>Contact</label>
               <td><input type="text" name="contact" value={this.state.contact} onChange={e => this.change(e)}/></td>
+              <label>Address</label>
+              <td><input type="text" name="address" value={this.state.address} onChange={e => this.change(e)}/></td>
               <label>Subscription Id</label>
-              <td><input type="number" name="sub" value={this.state.sub} onChange={e => this.change(e)}/></td>
+              <td><select style={{width:"180px", height:"30px"}} name="sub" value={this.state.sub} onChange={e => this.change(e)}>
+                <option>Select</option>
+                {
+                  this.state.services.map((item, i) => (
+                  <option>{item['service']}</option>
+                  ))
+                }
+              </select></td>
               <label>Device Id</label>
-              <td><input type="number" name="device" value={this.state.device} onChange={e => this.change(e)}/></td>
-              </Modal.Body>
+              <td><select style={{width:"180px", height:"30px"}} name="device" value={this.state.device} onChange={e => this.change(e)}>
+                <option>Select</option>
+                {
+                  this.state.devices.map((item, i) => (
+                  <option>{item['device']}</option>
+                  ))
+                }
+              </select></td>
+            </Modal.Body>
             <Modal.Footer>
               <span style={{color:"red"}}>{this.state.err}</span>
               <Button variant="secondary" onClick={this.handleClose}>Close</Button>

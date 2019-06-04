@@ -17,22 +17,45 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     componentDidMount(){
       this.getDevices();
       console.log(this.setState);
-
     }
 
 
-      getDevices = _ =>{
-          fetch('http://localhost:4000/devices')
-          .then(res => {
-            console.log(res);
-            return res.json()
-         })
-        .then(devices => {
-            console.log(devices);
-            this.setState({ devices: devices })
-         })
-          .catch(err => console.error(err));
-      };
+    getDevices = _ =>{
+        fetch('http://localhost:4000/devices')
+        .then(res => {
+          console.log(res);
+          return res.json()
+       })
+      .then(devices => {
+          console.log(devices);
+          this.setState({ devices: devices })
+       })
+        .catch(err => console.error(err));
+    };
+
+    deleteDevice = id =>{
+      fetch('http://localhost:4000/devices/'+id,{method : 'DELETE'})
+      .then(res => {
+        return res.status(200);
+      })
+      .catch(err => console.error(err));
+    };
+
+    addDevice = device =>
+      {
+        console.log(device);
+
+        fetch('http://localhost:4000/devices/',{
+          method : 'POST',
+          headers: {'Content-Type':'application/json'},
+          body : JSON.stringify(device)
+
+      })
+      .then(res => {
+        return res.json();
+     })
+     .catch(err => console.error(err));
+    };
 
 
 
@@ -59,6 +82,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       }
       else{
         row.push([states.sno++, states.name, states.desc, states.price]);
+
+        var custom_device = {
+          "device": states.name,
+          "price" : states.price,
+          "description" : states.desc
+        }
+
         this.setState({
           devices : row,
           name : '',
@@ -66,12 +96,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           price : '',
           err: ''
         });
+
+        this.addDevice(custom_device);
       }
     };
 
     //rows: array from which element is to be deleted
-    delete = (index, rows) => {
+    delete = (index, rows, item) => {
       rows.splice(index,1);
+      this.deleteDevice(item.id);
     };
 
     render(){
@@ -102,7 +135,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 <td><a href="#" onClick={() =>
                   {
                     if (window.confirm('Are you sure you wish to delete this item?'))
-                      this.delete(i, this.state.devices) }
+                      this.delete(i, this.state.devices, item) }
                   }>
                   <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"40%"}} /></a></td>
               </tr>

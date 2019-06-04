@@ -32,6 +32,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         .catch(err => console.error(err));
     };
 
+    deleteService = id =>{
+      fetch('http://localhost:4000/services/'+id,{method : 'DELETE'})
+      .then(res => {
+        return res.status(200);
+      })
+      .catch(err => console.error(err));
+    };
+
+    addService = service =>
+    {
+      console.log(service);
+
+      fetch('http://localhost:4000/services/',{
+        method : 'POST',
+        headers: {'Content-Type':'application/json'},
+        body : JSON.stringify(service)
+      })
+      .then(res => {
+        return res.json();
+     })
+     .catch(err => console.error(err));
+    };
+
 
     handleClose=()=> {
       this.setState({ showPopup: false });
@@ -56,6 +79,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       }
       else{
         row.push([states.sno++, states.name, states.validity, states.volume, states.speed, states.price, states.type]);
+
+        var custom_service = {
+          "service": states.name,
+          "validity" : states.validity,
+          "data" : states.volume,
+          "speed" : states.speed,
+          "price" : states.price,
+          "type" : states.type,
+        }
+
         this.setState({
           packages : row,
           name : '',
@@ -66,21 +99,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           type : '',
           err: ''
         });
+
+        this.addService(custom_service);
       }
     };
 
     //rows: array from which element is to be deleted
-    delete = (index, rows) => {
-      let row = rows;
-      row.splice(index,1);
-      let count=1;
-      {row.map((item, i) => (
-        row[i][0]=count++
-      ))}
-      this.setState({
-        packages  : row,
-        sno : this.state.sno-1
-      });
+    delete = (index, rows, item) => {
+      rows.splice(index,1);
+      this.deleteService(item.id);
     };
 
     render(){
@@ -118,7 +145,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 <td><a href="#" onClick={() =>
                   {
                     if (window.confirm('Are you sure you wish to delete this item?'))
-                      this.delete(i, this.state.packages) }
+                      this.delete(i, this.state.packages, item) }
                   }>
                   <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"40%"}} /></a></td>
               </tr>
@@ -146,7 +173,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             <label>Price</label>
             <td><input type="number" name="price" value={this.state.price} onChange={e => this.change(e)}/></td>
             <label>Type</label>
-            <td><select name="type" value={this.state.type} onChange={e => this.change(e)}>
+            <td><select style={{width:"180px", height:"30px"}} name="type" value={this.state.type} onChange={e => this.change(e)}>
               <option>Select</option>
               <option>Data</option>
               <option>Broadband</option>
