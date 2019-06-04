@@ -73,6 +73,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     handleClose=()=> {
       this.setState({ showPopup: false });
+      this.setState({
+        name : '',
+        validity : '',
+        volume : '',
+        speed : '',
+        price : '',
+        type : '',
+        err: ''
+      });
     }
 
     handleShow=()=> {
@@ -81,6 +90,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     editClose=()=> {
       this.setState({ editPopup: false });
+      this.setState({
+        name : '',
+        validity : '',
+        volume : '',
+        speed : '',
+        price : '',
+        type : '',
+        err: ''
+      });
     }
 
     editShow=()=> {
@@ -100,6 +118,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           err : 'empty field!'
         });
       }
+      else if(states.price<0){
+        this.setState({
+          err : 'price cannot be negative'
+        });
+      }
       else{
         row.push([states.sno++, states.name, states.validity, states.volume, states.speed, states.price, states.type]);
 
@@ -112,18 +135,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "type" : states.type,
         }
 
-        this.setState({
-          packages : row,
-          name : '',
-          validity : '',
-          volume : '',
-          speed : '',
-          price : '',
-          type : '',
-          err: ''
-        });
-
         this.addService(custom_service);
+        this.handleClose();
       }
     };
 
@@ -131,6 +144,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       if(states.name==='' || states.validity==='' || states.volume==='' || states.speed==='' || states.price==='' || states.type===''){
         this.setState({
           err : 'empty field!'
+        });
+      }
+      else if(states.price<0){
+        this.setState({
+          err : 'price cannot be negative'
         });
       }
       else{
@@ -143,17 +161,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "type" : states.type,
         }
 
-        this.setState({
-          name : '',
-          validity : '',
-          volume : '',
-          speed : '',
-          price : '',
-          type : '',
-          err: ''
-        });
-
         this.editService(custom_service);
+        this.editClose();
       }
     };
 
@@ -166,8 +175,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     modalBody = () => {
       return(
         <div>
-          <label>Name</label>
-          <td><input type="text" name="name" value={this.state.name} onChange={e => this.change(e)}/></td>
           <label>Validity</label>
           <td><input type="text" name="validity" value={this.state.validity} onChange={e => this.change(e)}/></td>
           <label>Volume</label>
@@ -254,6 +261,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             <Modal.Title>Add Service</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            <label>Name</label>
+            <td><input type="text" name="name" value={this.state.name} onChange={e => this.change(e)}/></td>
             {this.modalBody()}
           </Modal.Body>
           <Modal.Footer>
@@ -271,12 +280,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             <Modal.Title>Edit Service</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+            <span><b>Name</b>:</span>  <span><td>{this.state.name}</td></span>
             {this.modalBody()}
           </Modal.Body>
           <Modal.Footer>
             <span style={{color:"red"}}>{this.state.err}</span>
-            <Button variant="secondary" onClick={this.state.err='', this.editClose}>Close</Button>
-            <Button variant="primary" onClick={()=> this.edit(this.state)}>Edit</Button>
+            <Button variant="secondary" onClick={this.editClose}>Close</Button>
+            <Button variant="primary" onClick={()=> this.edit(this.state)}>OK</Button>
           </Modal.Footer>
         </Modal>
 

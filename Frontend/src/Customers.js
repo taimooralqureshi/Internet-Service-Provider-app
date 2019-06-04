@@ -31,7 +31,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     componentDidMount(){
       this.getCustomers();
-    
+
     }
 
     getCustomers = _ =>{
@@ -79,8 +79,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
   addCustomer = customer =>
     {
-      
-      
+
+
       fetch('http://localhost:4000/customers/',{
         method : 'POST',
         headers: {'Content-Type':'application/json'},
@@ -90,16 +90,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     .then(res => {
       this.getCustomers();
       return res.json();
-     
+
    })
    .catch(err => console.error(err));
-  
+
   };
 
     expiryDateAndStatusUpdate=(item)=> {
 
       // console.log(item);
-      
+
       if (item.s_validity === null)
           alert("Sevice not purchase")
 
@@ -121,13 +121,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
     handleClose=()=> {
-     
+
       this.setState({ showPopup: false });
     }
 
     handleShow=()=> {
       this.getDevices();
-      this.getServices(); 
+      this.getServices();
       this.setState({ showPopup: true });
     }
 
@@ -161,7 +161,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     findDeviceId = name => {
       return  this.state.devices.find( s => s.device === name).id
-  
+
       // for(let i=0; i<this.state.devices.length; i++){
       //   if(this.state.devices['device']==name)
       //     return this.state.devices['id'];
@@ -169,7 +169,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     };
 
     add = states => {
-     
+
       let row = this.state.customers;
       if(states.name==='' || states.contact==='' || states.address==='' || states.sub==='' || states.device===''){
         this.setState({
@@ -179,8 +179,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       else{
         states.sub=this.findServiceId(states.sub);
         states.device=this.findDeviceId(states.device);
-      
-       
+
+
         var custom_customer = {
           "name": states.name,
           "contact" : states.contact,
@@ -189,7 +189,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "device_id" : states.device,
           "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
         }
-       
+
         // row.push([states.sno++, states.name, states.contact, states.address, states.sub, states.device]);
         this.setState({
           customers : row,
@@ -210,7 +210,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         //   "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
         // }
         }
-        
+
         this.addCustomer(custom_customer);
         this.handleClose();
       }
@@ -249,7 +249,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             </thead>
             <tbody>
             {
-            
+
               this.state.customers.map((item, i) => (
               <tr onClick={() => this.showDetails(item)} key={i}>
                   {this.expiryDateAndStatusUpdate(item)}
