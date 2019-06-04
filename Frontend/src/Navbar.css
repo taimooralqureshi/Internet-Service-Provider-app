@@ -79,10 +79,6 @@ Table a{
   border: 1px solid #e76229;
 }
 
-.icon{
-  color: red;
-}
-
 @media screen and (max-width: 600px){
   .pageMargin{
     margin-left: 50px;
