@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       super(props);
       this.state={
         packages:[],
-        name:'', validity:'', volume:'', speed:'', price:'', type:'', err:'', sno:1,
+        name:'', validity:'', volume:'', speed:'', price:'', type:'', err:'', sno:1,service_id:1,
         showPopup:false
       };
     }
@@ -35,6 +35,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     deleteService = id =>{
       fetch('http://localhost:4000/services/'+id,{method : 'DELETE'})
       .then(res => {
+        this.getServices();
         return res.status(200);
       })
       .catch(err => console.error(err));
@@ -50,21 +51,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         body : JSON.stringify(service)
       })
       .then(res => {
+        this.getServices();
         return res.json();
      })
      .catch(err => console.error(err));
     };
 
-    editService = service =>
+    editService = (service,id) =>
     {
       console.log(service);
 
-      fetch('http://localhost:4000/services/',{
+      fetch('http://localhost:4000/services/'+id,{
         method : 'PUT',
         headers: {'Content-Type':'application/json'},
         body : JSON.stringify(service)
       })
       .then(res => {
+        this.getServices();
         return res.json();
      })
      .catch(err => console.error(err));
@@ -101,7 +104,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         });
       }
       else{
-        row.push([states.sno++, states.name, states.validity, states.volume, states.speed, states.price, states.type]);
+        // row.push([states.sno++, states.name, states.validity, states.volume, states.speed, states.price, states.type]);
 
         var custom_service = {
           "service": states.name,
@@ -113,7 +116,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         }
 
         this.setState({
-          packages : row,
           name : '',
           validity : '',
           volume : '',
@@ -124,6 +126,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         });
 
         this.addService(custom_service);
+        this.handleClose();
       }
     };
 
@@ -151,9 +154,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           price : '',
           type : '',
           err: ''
+          
         });
 
-        this.editService(custom_service);
+        this.editService(custom_service,states.service_id);
+        this.editClose();
       }
     };
 
@@ -211,23 +216,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             {
               this.state.packages.map((item, i) => (
               <tr key={i}>
-                <td>{this.state.packages[i]['id']}</td>
-                <td>{this.state.packages[i]['service']}</td>
-                <td>{this.state.packages[i]['validity']}</td>
-                <td>{this.state.packages[i]['data']}</td>
-                <td>{this.state.packages[i]["speed"]}</td>
-                <td>{this.state.packages[i]['price']}</td>
-                <td>{this.state.packages[i]['type']}</td>
+                <td>{i+1}</td>
+                <td>{item.service}</td>
+                <td>{item.validity}</td>
+                <td>{item.data}</td>
+                <td>{item.speed}</td>
+                <td>{item.price}</td>
+                <td>{item.type}</td>
                 <td>
                   <a href="#" onClick={() =>
                   {
                     this.setState({
-                      name : this.state.packages[i]['service'],
-                      validity : this.state.packages[i]['validity'],
-                      volume : this.state.packages[i]['data'],
-                      speed : this.state.packages[i]['speed'],
-                      price : this.state.packages[i]['price'],
-                      type : this.state.packages[i]['type']
+                      name : item.service,
+                      validity : item.validity,
+                      volume : item.data,
+                      speed : item.speed,
+                      price : item.price,
+                      type : item.type,
+                      service_id : item.id
+
                     });
                     this.editShow()
                   }
@@ -259,7 +266,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           <Modal.Footer>
             <span style={{color:"red"}}>{this.state.err}</span>
             <Button variant="secondary" onClick={this.handleClose}>Close</Button>
-            <Button variant="primary" onClick={()=> this.add(this.state)}>Add</Button>
+            <Button variant="primary" onClick={()=> this.add(this.state)}>Ok</Button>
           </Modal.Footer>
         </Modal>
 
@@ -275,8 +282,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           </Modal.Body>
           <Modal.Footer>
             <span style={{color:"red"}}>{this.state.err}</span>
-            <Button variant="secondary" onClick={this.state.err='', this.editClose}>Close</Button>
-            <Button variant="primary" onClick={()=> this.edit(this.state)}>Edit</Button>
+            <Button variant="secondary" onClick={()=>{this.state.err=''; this.editClose()}}>Close</Button>
+            <Button variant="primary" onClick={()=> this.edit(this.state)}>Ok</Button>
           </Modal.Footer>
         </Modal>
 

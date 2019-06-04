@@ -253,7 +253,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               this.state.customers.map((item, i) => (
               <tr onClick={() => this.showDetails(item)} key={i}>
                   {this.expiryDateAndStatusUpdate(item)}
-                <td>{item.id}</td>
+                <td>{i+1}</td>
                 <td>{item.name}</td>
                 <td>{item.contact}</td>
                 <td>{item.s_name}</td>

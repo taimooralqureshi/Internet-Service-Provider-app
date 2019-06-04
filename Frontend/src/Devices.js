@@ -36,7 +36,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     deleteDevice = id =>{
       fetch('http://localhost:4000/devices/'+id,{method : 'DELETE'})
       .then(res => {
-        return res.status(200);
+        this.getDevices();
+        return res.json();
       })
       .catch(err => console.error(err));
     };
@@ -52,6 +53,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
       })
       .then(res => {
+        this.getDevices();
         return res.json();
      })
      .catch(err => console.error(err));
@@ -128,10 +130,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             {
               this.state.devices.map((item, i) => (
               <tr key={i}>
-                <td>{this.state.devices[i]['id']}</td>
-                <td>{this.state.devices[i]['device']}</td>
-                <td>{this.state.devices[i]['description']}</td>
-                <td>Rs.{this.state.devices[i]['price']}</td>
+                <td>{i+1}</td>
+                <td>{item.device}</td>
+                <td>{item.description}</td>
+                <td>Rs.{item.price}</td>
                 <td><a href="#" onClick={() =>
                   {
                     if (window.confirm('Are you sure you wish to delete this item?'))
