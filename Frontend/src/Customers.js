@@ -45,6 +45,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         .catch(err => console.error(err));
     };
 
+
     getDevices = _ =>{
         fetch('http://localhost:4000/devices')
         .then(res => {
@@ -87,10 +88,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     })
     .then(res => {
+      this.getCustomers();
       return res.json();
+     
    })
    .catch(err => console.error(err));
-   this.getCustomers();
+  
   };
 
     expiryDateAndStatusUpdate=(item)=> {
