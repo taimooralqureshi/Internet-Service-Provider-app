@@ -31,8 +31,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     componentDidMount(){
       this.getCustomers();
-      this.getDevices();
-      this.getServices();
+    
     }
 
     getCustomers = _ =>{
@@ -72,15 +71,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     deleteCustomer = id =>{
       fetch('http://localhost:4000/customers/'+id,{method : 'DELETE'})
       .then(res => {
-        return res.status(200);
+        return res.json();
      })
     .catch(err => console.error(err));
   };
 
   addCustomer = customer =>
     {
-      console.log(customer);
-
+      
+      
       fetch('http://localhost:4000/customers/',{
         method : 'POST',
         headers: {'Content-Type':'application/json'},
@@ -91,31 +90,41 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       return res.json();
    })
    .catch(err => console.error(err));
+   this.getCustomers();
   };
 
     expiryDateAndStatusUpdate=(item)=> {
+
+      // console.log(item);
+      
+      if (item.s_validity === null)
+          alert("Sevice not purchase")
+
      let date = new Date(item.active_date)
-      // let expiryDate = "UnKnown Activation Date";
+      let expiryDate = "UnKnown Activation Date";
 
-      // if (item.s_validity.toLowerCase().search('month') !== -1)
-      //      expiryDate = date.addMonths(item.s_validity.split(' ')[0]);
-      // else if (item.s_validity.toLowerCase().search('day') !== -1)
-      //      expiryDate = date.addDays(item.s_validity.split(' ')[0]);
+      if (item.s_validity.toLowerCase().search('month') !== -1)
+           expiryDate = date.addMonths(item.s_validity.split(' ')[0]);
+      else if (item.s_validity.toLowerCase().search('day') !== -1)
+           expiryDate = date.addDays(item.s_validity.split(' ')[0]);
 
-      //   item['exp'] = expiryDate;
-      // if(expiryDate >= Date.now())
-      //     item.status = "Active";
-      //   else
-      //   item.status = "Deactive";
+        item['exp'] = expiryDate;
+      if(expiryDate >= Date.now())
+          item.status = "Active";
+        else
+        item.status = "Deactive";
 
     };
 
 
     handleClose=()=> {
+     
       this.setState({ showPopup: false });
     }
 
     handleShow=()=> {
+      this.getDevices();
+      this.getServices(); 
       this.setState({ showPopup: true });
     }
 
@@ -140,20 +149,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     };
 
     findServiceId = name => {
-      for(let i=0; i<this.state.services.length; i++){
-        if(this.state.services['service']==name)
-          return this.state.services['id'];
-      }
+    return  this.state.services.find( s => s.service === name).id
+    //   for(let i=0; i<this.state.services.length; i++){
+    //     if(this.state.services['service']==name)
+    //       return this.state.services['id'];
+    //   }
     };
 
     findDeviceId = name => {
-      for(let i=0; i<this.state.devices.length; i++){
-        if(this.state.devices['device']==name)
-          return this.state.devices['id'];
-      }
+      return  this.state.devices.find( s => s.device === name).id
+  
+      // for(let i=0; i<this.state.devices.length; i++){
+      //   if(this.state.devices['device']==name)
+      //     return this.state.devices['id'];
+      // }
     };
 
     add = states => {
+     
       let row = this.state.customers;
       if(states.name==='' || states.contact==='' || states.address==='' || states.sub==='' || states.device===''){
         this.setState({
@@ -163,8 +176,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       else{
         states.sub=this.findServiceId(states.sub);
         states.device=this.findDeviceId(states.device);
-        row.push([states.sno++, states.name, states.contact, states.address, states.sub, states.device]);
-
+      
+       
         var custom_customer = {
           "name": states.name,
           "contact" : states.contact,
@@ -173,7 +186,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "device_id" : states.device,
           "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
         }
-
+       
+        // row.push([states.sno++, states.name, states.contact, states.address, states.sub, states.device]);
         this.setState({
           customers : row,
           name : '',
@@ -193,8 +207,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         //   "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
         // }
         }
-
+        
         this.addCustomer(custom_customer);
+        this.handleClose();
       }
     };
 
@@ -204,8 +219,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       this.deleteCustomer(item.id)
     };
 
+
     render(){
+      console.log(this.state.customers);
+
       return(
+
       <div id="customers" className="pageMargin">
         <div>
           <Button id="addBtn" onClick={this.handleShow}>Add</Button><br/>
@@ -227,6 +246,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             </thead>
             <tbody>
             {
+            
               this.state.customers.map((item, i) => (
               <tr onClick={() => this.showDetails(item)} key={i}>
                   {this.expiryDateAndStatusUpdate(item)}
