@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       super(props);
       this.state={
         packages:[],
-        name:'', validity:'', volume:'', speed:'', price:'', type:'', err:'', sno:1,service_id:1,
+        name:'', validity:'', volume:'', speed:'', price:'', type:'', err:'', sno:1, service_id:1,
         showPopup:false
       };
     }
@@ -75,8 +75,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
     handleClose=()=> {
-      this.setState({ showPopup: false });
       this.setState({
+        showPopup: false,
         name : '',
         validity : '',
         volume : '',
@@ -92,8 +92,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     }
 
     editClose=()=> {
-      this.setState({ editPopup: false });
       this.setState({
+        editPopup: false,
         name : '',
         validity : '',
         volume : '',
@@ -138,16 +138,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "type" : states.type,
         }
 
-        this.setState({
-          name : '',
-          validity : '',
-          volume : '',
-          speed : '',
-          price : '',
-          type : '',
-          err: ''
-        });
-
         this.addService(custom_service);
         this.handleClose();
       }
@@ -173,17 +163,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "price" : states.price,
           "type" : states.type,
         }
-
-        this.setState({
-          name : '',
-          validity : '',
-          volume : '',
-          speed : '',
-          price : '',
-          type : '',
-          err: ''
-          
-        });
 
         this.editService(custom_service,states.service_id);
         this.editClose();
@@ -271,8 +250,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                     if (window.confirm('Are you sure you wish to delete this item?'))
                       this.delete(i, this.state.packages, item) }
                   }>
-                  <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"20%", color:"red"}} /></a>
-                </td>
+                  <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"20%", color:"red"}} /></a></td>
               </tr>
               ))
             }

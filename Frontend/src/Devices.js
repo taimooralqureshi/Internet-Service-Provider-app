@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       super(props);
       this.state={
         devices:[],
-        name:'', desc:'', price:'', err:'', sno:1,
+        name:'', desc:'', price:'', err:'', sno:1, device_id:1,
         showPopup:false
       };
     }
@@ -59,15 +59,54 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
      .catch(err => console.error(err));
     };
 
+    editDevice = (device,id) =>
+    {
+      console.log(device);
+
+      fetch('http://localhost:4000/devices/'+id,{
+        method : 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body : JSON.stringify(device)
+      })
+      .then(res => {
+        this.getDevices();
+        return res.json();
+     })
+     .catch(err => console.error(err));
+    };
+
 
 
     handleClose=()=> {
-      this.setState({ showPopup: false });
+      this.setState({
+        showPopup: false,
+        name : '',
+        desc : '',
+        price : '',
+        err: ''
+      });
     }
 
     handleShow=()=> {
       this.setState({ showPopup: true });
     }
+
+    editClose=()=> {
+      this.setState({
+        editPopup: false,
+        name : '',
+        desc : '',
+        price : '',
+        err: ''
+      });
+    }
+
+    editShow=()=> {
+      this.setState({ editPopup: true });
+    }
+
+
+
 
     change = e => {
       this.setState({
@@ -82,8 +121,38 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           err : 'empty field!'
         });
       }
+      else if(states.price<0){
+        this.setState({
+          err : 'price cannot be negative'
+        });
+      }
       else{
-        row.push([states.sno++, states.name, states.desc, states.price]);
+        //row.push([states.sno++, states.name, states.desc, states.price]);
+
+        var custom_device = {
+          "device": states.name,
+          "price" : states.price,
+          "description" : states.desc,
+        }
+
+        this.addDevice(custom_device);
+        this.handleClose();
+      }
+    };
+
+    edit = states => {
+      if(states.name==='' || states.desc==='' || states.price===''){
+        this.setState({
+          err : 'empty field!'
+        });
+      }
+      else if(states.price<0){
+        this.setState({
+          err : 'price cannot be negative'
+        });
+      }
+      else{
+        //row.push([states.sno++, states.name, states.desc, states.price]);
 
         var custom_device = {
           "device": states.name,
@@ -91,15 +160,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "description" : states.desc
         }
 
-        this.setState({
-          devices : row,
-          name : '',
-          desc : '',
-          price : '',
-          err: ''
-        });
-
-        this.addDevice(custom_device);
+        this.editDevice(custom_device, states.device_id);
+        this.editClose();
       }
     };
 
@@ -123,7 +185,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <th>Name</th>
               <th>Description</th>
               <th>Price</th>
-              <th style={{width:"50px"}}>Remove</th>
+              <th style={{width:"100px"}}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -134,12 +196,26 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 <td>{item.device}</td>
                 <td>{item.description}</td>
                 <td>Rs.{item.price}</td>
-                <td><a href="#" onClick={() =>
+                <td>
+                  <a href="#" onClick={() =>
+                  {
+                    this.setState({
+                      name : item.device,
+                      desc : item.description,
+                      price : item.price,
+                      device_id : item.id
+
+                    });
+                    this.editShow()
+                  }
+                  }>
+                  <FontAwesomeIcon className="icon" icon="edit" style={{marginLeft:"20%", color:"blue"}} /></a>
+                  <a href="#" onClick={() =>
                   {
                     if (window.confirm('Are you sure you wish to delete this item?'))
                       this.delete(i, this.state.devices, item) }
                   }>
-                  <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"40%"}} /></a></td>
+                  <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"20%", color:"red"}} /></a></td>
               </tr>
               ))
             }
@@ -164,7 +240,28 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           <Modal.Footer>
             <span style={{color:"red"}}>{this.state.err}</span>
             <Button variant="secondary" onClick={this.handleClose}>Close</Button>
-            <Button variant="primary" onClick={()=> this.add(this.state)}>Add</Button>
+            <Button variant="primary" onClick={()=> this.add(this.state)}>OK</Button>
+          </Modal.Footer>
+        </Modal>
+
+        {
+          //edit button popup
+        }
+        <Modal size="sm" show={this.state.editPopup} onHide={this.editClose}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Device</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <span><b>Name</b>:</span>  <span><td>{this.state.name}</td></span>
+            <label>Description</label>
+            <td><input type="text" name="desc" value={this.state.desc} onChange={e => this.change(e)}/></td>
+            <label>Price</label>
+            <td><input type="number" name="price" value={this.state.price} onChange={e => this.change(e)}/></td>
+          </Modal.Body>
+          <Modal.Footer>
+            <span style={{color:"red"}}>{this.state.err}</span>
+            <Button variant="secondary" onClick={this.editClose}>Close</Button>
+            <Button variant="primary" onClick={()=> this.edit(this.state)}>OK</Button>
           </Modal.Footer>
         </Modal>
       </div>
