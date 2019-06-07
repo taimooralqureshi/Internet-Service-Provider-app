@@ -71,6 +71,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     deleteCustomer = id =>{
       fetch('http://localhost:4000/customers/'+id,{method : 'DELETE'})
       .then(res => {
+        this.getCustomers();
         return res.json();
      })
     .catch(err => console.error(err));
@@ -90,7 +91,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
    })
    .catch(err => console.error(err));
-
   };
 
     expiryDateAndStatusUpdate=(item)=> {
@@ -126,7 +126,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         body : JSON.stringify(customer)
       })
       .then(res => {
-        this.getSCustomers();
+        this.getCustomers();
         return res.json();
      })
      .catch(err => console.error(err));
@@ -216,7 +216,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       }
       else{
         states.sub=this.findServiceId(states.sub);
-        states.device=this.findDeviceId(states.device);
+        if(states.device !== null)
+          states.device=this.findDeviceId(states.device);
+        else states.device=null;
 
         var custom_customer = {
           "name": states.name,
@@ -252,7 +254,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       }
       else{
         states.sub=this.findServiceId(states.sub);
-        states.device=this.findDeviceId(states.device);
+        if(states.device !== null)
+          states.device=this.findDeviceId(states.device);
+        else states.device=null;
 
         var custom_customer = {
           "name": states.name,
@@ -260,7 +264,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "address" : states.address,
           "service_id" : states.sub,
           "device_id" : states.device,
-          "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
         }
 
         this.editCustomer(custom_customer, states.customer_id);
@@ -273,6 +276,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       rows.splice(index,1);
       this.deleteCustomer(item.id)
     };
+
+    renewDate = item => {
+      var custom_customer = {
+        "active_date" : (new Date()).toJSON().slice(0,10).split('-').join('/')
+      }
+      this.editCustomer(custom_customer, item.id);
+    };
+
+    renew = item =>{
+      if(item.status=="Deactive")
+        return(<span>
+          <a href="#" onClick={() =>
+            {this.renewDate(item)}
+            }>
+            <FontAwesomeIcon className="icon" icon="arrow-alt-circle-up" style={{float:"right", color:"gray"}} /></a>
+          </span>);
+      return(<span></span>);
+    }
 
     modalBody = () => {
       return(
@@ -323,7 +344,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <th>Contact</th>
               <th>Subscription</th>
               <th>Status</th>
-              <th style={{width:"100px"}}>Remove</th>
+              <th style={{width:"100px"}}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -336,7 +357,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <td onClick={() => this.showDetails(item)}>{item.name}</td>
               <td onClick={() => this.showDetails(item)}>{item.contact}</td>
               <td onClick={() => this.showDetails(item)}>{item.s_name}</td>
-              <td onClick={() => this.showDetails(item)}>{item.status}</td>
+              <td>{item.status}<span>{this.renew(item)}</span></td>
               <td>
               <a href="#" onClick={() =>
               {
