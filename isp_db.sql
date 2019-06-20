@@ -405,3 +405,88 @@ FROM
 GROUP BY c.id
 ORDER BY c.id;
 */
+
+CREATE TABLE fa_Cash (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT UNSIGNED NOT NULL
+);
+
+
+CREATE TABLE fa_AP (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT NOT NULL
+);
+
+CREATE TABLE fa_AR (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT NOT NULL
+);
+
+CREATE TABLE fa_Rev (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT NOT NULL
+);
+
+CREATE TABLE fa_Exp (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT NOT NULL
+);
+
+CREATE TABLE fa_OW (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT NOT NULL
+);
+
+CREATE TABLE fa_OC (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('Debit', 'Credit'),
+    amount INT NOT NULL
+);
+
+
+drop table if exists fa_account;
+create table fa_account(
+	id int not null primary key auto_increment,
+    name varchar(50) not null unique key
+);
+
+insert into fa_account(name) values 
+("Cash"),
+("AP"),
+("AR"),
+("Exp"),
+("Rev"),
+("OC"),
+("OW");
+
+SELECT 
+    *
+FROM
+    fa_account;
+
+CREATE TABLE fa_transaction (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    trans_type ENUM('Normal', 'Closing', 'Adjustment')
+);
+
+CREATE TABLE fa_Entry (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    entry_type ENUM('Debit', 'Credit'),
+    amount INT UNSIGNED NOT NULL,
+    account_name VARCHAR(50) NOT NULL,
+    trans_id INT NOT NULL,
+    FOREIGN KEY (trans_id)
+        REFERENCES fa_transaction (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (account_name)
+        REFERENCES fa_account (name)
+        ON DELETE CASCADE
+);
+
+
