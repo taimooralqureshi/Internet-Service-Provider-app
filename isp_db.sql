@@ -408,46 +408,55 @@ ORDER BY c.id;
 CREATE TABLE fa_Cash (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT UNSIGNED NOT NULL
+    amount INT UNSIGNED NOT NULL,
+    date date
 );
 
+INSERT into fa_Cash (type, amount, date) values ("Debit", 1000, "2019/05/15");
 
 CREATE TABLE fa_AP (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT NOT NULL
+    amount INT NOT NULL,
+    date date
 );
 
 CREATE TABLE fa_AR (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT NOT NULL
+    amount INT NOT NULL,
+    date date
 );
 
 CREATE TABLE fa_Rev (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT NOT NULL
+    amount INT NOT NULL,
+    date date
 );
 
 CREATE TABLE fa_Exp (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT NOT NULL
+    amount INT NOT NULL,
+    date date
 );
 
 CREATE TABLE fa_OW (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT NOT NULL
+    amount INT NOT NULL,
+    date date
 );
 
 CREATE TABLE fa_OC (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
-    amount INT NOT NULL
+    amount INT NOT NULL,
+    date date
 );
 
+insert into fa_OC (type, amount, date) values ("Credit", 1000, "2019/05/15");
 
 drop table if exists fa_account;
 create table fa_account(
@@ -487,3 +496,34 @@ CREATE TABLE fa_Entry (
         REFERENCES fa_account (name)
         ON DELETE CASCADE
 );
+
+insert into fa_transaction (id, date, trans_type) values
+(1, "2019/05/15", "Normal");
+
+insert into fa_Entry (entry_type,amount,account_name,trans_id) values
+("Debit", 1000, "Cash", 1),
+("Credit", 1000, "OC", 1);
+
+drop procedure if exists entry_data;
+
+DELIMITER $$
+CREATE PROCEDURE entry_data()
+BEGIN        
+
+SELECT 
+    e.*,
+    t.date as t_date,
+    t.trans_type as t_type,
+    a.type as a_type
+FROM
+    fa_Entry e
+        LEFT OUTER JOIN
+    fa_transaction t ON e.trans_id = t.id
+        LEFT OUTER JOIN
+    fa_account a ON e.account_name = a.name
+ORDER BY t.id;
+
+END$$ 
+DELIMITER ;
+
+call entry_data();
