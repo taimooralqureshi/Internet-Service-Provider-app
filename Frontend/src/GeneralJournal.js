@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       super(props);
       this.state={
         showPopup:false, debitInput:[], creditInput:[],
-        d_desc: '', d_amount: '', d_type: '', c_desc: '', c_amount: '', c_type: '',
-        entries:[]
+        d_desc: '', d_amount: '', d_type: '', c_desc: '', c_amount: '', c_type: '', date:'', err:'', chkbox:false,
+        entries:[], transactions:[]
       };
     }
 
@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     componentDidMount(){
       this.getEntries();
+      this.getTransactions();
     }
 
     getEntries = _ =>{
@@ -29,6 +30,59 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         .catch(err => console.error(err));
     };
 
+    getTransactions = _ =>{
+        fetch('http://localhost:4000/fa_transaction')
+        .then(res => {
+          console.log(res);
+          return res.json()
+       })
+      .then(fa_transactions => {
+          console.log(fa_transactions);
+          this.setState({ transactions: fa_transactions })
+       })
+        .catch(err => console.error(err));
+    };
+
+    addEntry = entry =>
+    {
+      fetch('http://localhost:4000/fa_Entry/',{
+        method : 'POST',
+        headers: {'Content-Type':'application/json'},
+        body : JSON.stringify(entry)
+      })
+      .then(res => {
+        this.getEntries();
+        return res.json();
+      })
+      .catch(err => console.error(err));
+    };
+
+    addTransaction = trans =>
+    {
+      console.log(trans);
+
+      fetch('http://localhost:4000/fa_transaction/',{
+        method : 'POST',
+        headers: {'Content-Type':'application/json'},
+        body : JSON.stringify(trans)
+
+      })
+      .then(res => {
+        this.getTransactions();
+        return res.json();
+      })
+      .catch(err => console.error(err));
+    };
+
+    deleteEntry = id =>{
+      fetch('http://localhost:4000/fa_Entry/'+id,{method : 'DELETE'})
+      .then(res => {
+        this.getEntries();
+        return res.json();
+       })
+      .catch(err => console.error(err));
+    };
+
     //-----------------------------------Database functions ends--------------------------------------------------------
 
     handleClose=()=> {
@@ -36,6 +90,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         showPopup: false,
         d_desc:'', d_amount:'', d_type:'',
         c_desc:'', c_amount:'', c_type:'',
+        date:'', err:'', chkbox:false,
         debitInput:[],
         creditInput:[]
       });
@@ -82,36 +137,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     };
 
     add = states => {
-    //   let row = this.state.rows;
-    //   if(states.chkbox==true) states.date='Adj';
-    //   let creditAmount=0, debitAmount=0;
-    //   for(let i=0; i<states.debit.length; i++){
-    //     debitAmount+=parseInt(states.debit[i][1]);
-    //   }
-    //   for(let i=0; i<states.credit.length; i++){
-    //     creditAmount+=parseInt(states.credit[i][1]);
-    //   }
-    //   if(states.date=='' || states.debit.length==0 || states.credit.length==0){
-    //     this.setState({
-    //       err : 'empty field!'
-    //     });
-    //   }
-    //   else if(debitAmount!=creditAmount){
-    //     this.setState({
-    //       err : 'inequal debit and credit amount!'
-    //     });
-    //   }
-    //   else{
-    //     row.push([states.date, states.debit, states.credit]);
-    //     this.setState({
-    //       rows : row,
-    //       date : '',
-    //       debit : [],
-    //       credit : [],
-    //       err : '',
-    //       chkbox: false
-    //     });
-    //   }
+      let type='';
+      if(this.state.chkbox==true)
+        type="Adjustment";
+      else type="Normal";
+
+      var custom_trans = {
+        "date": this.state.date,
+        "trans_type": type
+      }
+      this.addTransaction(custom_trans);
+
+      for(let i=0; i<this.state.debitInput.length; i++)
+      {
+        var custom_entry = {
+          "entry_type": "Debit",
+          "amount": this.state.debitInput[i].amount,
+          "account_name": this.state.debitInput[i].description,
+          "trans_id": this.state.transactions[this.state.transactions.length-1].id
+        }
+        this.addEntry(custom_entry);
+      }
+
+      this.handleClose();
     };
 
     delete = (index, rows) => {
@@ -141,7 +189,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <td>{item.t_date}</td>
               <td>{item.description}</td>
               <td>{item.amount}</td>
-              <td>DELETE</td>
+              <td><a href="#" onClick={() =>
+                {
+                  if (window.confirm('Are you sure you wish to delete this item?'))
+                    this.deleteEntry(item.trans_id) }
+                }>
+                <FontAwesomeIcon className="icon" icon="trash" style={{marginLeft:"20%", color:"red"}} /></a>
+              </td>
             </tr>
             ))
           }

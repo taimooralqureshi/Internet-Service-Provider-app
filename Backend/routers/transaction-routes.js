@@ -1,80 +1,60 @@
 const router = require('express').Router();
 const connection = require('./../db');
+const TRANSACTION_QUERY = "SELECT * FROM fa_transaction";
 
 router.get('/', (req,res) => {
-    connection.query('CALL entry_data()', (err, result) => {
+    connection.query(TRANSACTION_QUERY, (err, result) => {
         if (err) throw err;
         else
-          return res.json(result[0])
+          return res.json(result)
     });
 });
 
+//  Retrieve user with id
 router.get('/:id', function (req, res) {
     let id = req.params.id;
-
-    connection.query("call entry_data(?)",id, (err, result) => {
+    connection.query(TRANSACTION_QUERY+' where id=?', id, (err, result) => {
         if (err) throw err;
         else
-          return res.json(result[0])
+          return res.json(result)
     });
 
 });
 
-
-router.get('/raw', (req,res) => {
-    connection.query('select * from fa_Entry', (err, result) => {
-        if (err) throw err;
-        else
-          return res.json(result);
-    });
-});
-
-router.get('/raw/:id', function (req, res) {
-    let id = req.params.id;
-
-    connection.query("select * from fa_Entry where id = ?",id, (err, result) => {
-        if (err) throw err;
-        else
-          return res.json(result[0])
-    });
-
-});
-
-
-
-//  Create New Customer
+//  Create New Device
 router.post('/', (req, res) => {
-    let entry = req.body;
+    let trans = req.body;
 
-    connection.query("Insert into fa_Entry set ?; ", entry, (err, result) => {
+    connection.query("Insert into fa_transaction set ?; ", trans, (err, result) => {
         if (err) throw err;
         else
         {
-            return res.send({ error: false, data: result, message: 'New entry has been created successfully.' });
+            return res.send({ error: false, data: result, message: 'New transaction has been created successfully.' });
         }
     });
 
 });
 
-// Update an existing customer
+
+// Update an existing device
 router.put('/:id', (request, response) => {
     const id = request.params.id;
 
-    connection.query('UPDATE fa_Entry SET ? WHERE id = ?', [request.body, id], (error, result) => {
+    connection.query('UPDATE fa_transaction SET ? WHERE id = ?', [request.body, id], (error, result) => {
         if (error) throw error;
 
-        response.send('Entry updated successfully.');
+        response.send('Transaction updated successfully.');
     });
 });
 
-// Delete a  Customer
+// Delete a device
 router.delete('/:id', (request, response) => {
     const id = request.params.id;
 
-    connection.query('DELETE FROM fa_Entry WHERE id = ?', id, (error, result) => {
+    connection.query('DELETE FROM fa_transaction WHERE id = ?', id, (error, result) => {
         if (error) throw error;
 
-        response.send('Entry deleted.');
+        response.send('Transaction deleted.');
     });
 });
 
