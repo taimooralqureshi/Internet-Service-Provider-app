@@ -102,3 +102,54 @@ Table a{
   font-size: 18px;
   padding: 10px 0;
 }
+
+.transactions .topmenu{
+  background-image: linear-gradient(#ec9841, #e75d72);
+  color: white;
+  padding: 5px 25%;
+}
+
+.transactions .topmenu a{
+  padding: 20px;
+  font-size: 18px;
+}
+
+/* .transactions Table{
+  width: 90%;
+  margin: auto;
+  margin-top: 30px;
+} */
+
+/* .transactions Table>tbody>tr:nth-child(even)>td,
+.table-striped>tbody>tr:nth-child(even)>th {
+   background-color: white;
+ } */
+
+/* .transactions #addBtn{
+  float: left;
+  margin: 10px 0 0 50px;
+  padding: 5px 30px;
+  background-color: #ec9941;
+  color: white;
+  border: 1px solid #ec9941;
+  border-radius: 25px;
+} */
+
+/* .transactions #addBtn:hover{
+  background-color: #e76229;
+  border: 1px solid #e76229;
+} */
+
+/* .transactions Table a{
+  color: black;
+  text-decoration: none;
+} */
+
+/* @media screen and (max-width: 600px){
+  .transactions{
+    margin-left: 50px;
+  }
+  .transactions .topmenu{
+    padding: 15px 7%;
+  }
+} */

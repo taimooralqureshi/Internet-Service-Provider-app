@@ -401,7 +401,6 @@ FROM
     service s ON c.service_id = s.id
         LEFT OUTER JOIN
     device d ON c.device_id = d.id OR c.device_id = NULL
-
 GROUP BY c.id
 ORDER BY c.id;
 */
@@ -453,17 +452,16 @@ CREATE TABLE fa_OC (
 drop table if exists fa_account;
 create table fa_account(
 	id int not null primary key auto_increment,
-    name varchar(50) not null unique key
+    name varchar(50) not null unique key,
+    type ENUM('Cash', 'Asset', 'Liability', 'OC', 'OW', 'Revenue', 'Expense')
 );
 
-insert into fa_account(name) values 
-("Cash"),
-("AP"),
-("AR"),
-("Exp"),
-("Rev"),
-("OC"),
-("OW");
+insert into fa_account(name, type) values 
+("Cash", "Cash"),
+("AP", "Liability"),
+("AR", "Asset"),
+("OC", "OC"),
+("OW", "OW");
 
 SELECT 
     *
@@ -472,6 +470,7 @@ FROM
 
 CREATE TABLE fa_transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    date DATE,
     trans_type ENUM('Normal', 'Closing', 'Adjustment')
 );
 
@@ -488,5 +487,3 @@ CREATE TABLE fa_Entry (
         REFERENCES fa_account (name)
         ON DELETE CASCADE
 );
-
-

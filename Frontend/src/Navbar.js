@@ -4,13 +4,14 @@ import Services from './Services';
 import Customers from './Customers';
 import Devices from './Devices';
 import Home from './Home';
+import Transactions from './Transactions';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 class Navbar extends Component{
   constructor(props){
     super(props);
     this.state={
-      home:true, customers:false, devices:false, services:false
+      home:true, customers:false, devices:false, services:false, transactions:false
     };
   }
 
@@ -19,7 +20,8 @@ class Navbar extends Component{
       home:true,
       customers:false,
       devices:false,
-      services:false
+      services:false,
+      transactions:false
     });
   };
 
@@ -28,7 +30,8 @@ class Navbar extends Component{
       home:false,
       customers:false,
       devices:false,
-      services:true
+      services:true,
+      transactions:false
     });
   };
 
@@ -37,7 +40,8 @@ class Navbar extends Component{
       home:false,
       customers:false,
       devices:true,
-      services:false
+      services:false,
+      transactions:false
     });
   };
 
@@ -46,7 +50,18 @@ class Navbar extends Component{
       home:false,
       customers:true,
       devices:false,
-      services:false
+      services:false,
+      transactions:false
+    });
+  };
+
+  toggleTransactions=()=>{
+    this.setState({
+      home:false,
+      customers:false,
+      devices:false,
+      services:false,
+      transactions:true
     });
   };
 
@@ -61,6 +76,7 @@ class Navbar extends Component{
               <a onClick={this.toggleServices}><FontAwesomeIcon className="icon" icon="signal" />Services</a><br/>
               <a onClick={this.toggleDevices}><FontAwesomeIcon className="icon" icon="digital-tachograph" />Devices</a><br/>
               <a onClick={this.toggleCustomers}><FontAwesomeIcon className="icon" icon="user-friends" />Customers</a><br/>
+              <a onClick={this.toggleTransactions}><FontAwesomeIcon className="icon" icon="user-friends" />Transactions</a><br/>
               <div style={{padding:"100px"}}></div>
             </div>
           }
@@ -70,6 +86,7 @@ class Navbar extends Component{
               <a onClick={this.toggleServices}><FontAwesomeIcon className="icon" icon="signal" /></a><br/>
               <a onClick={this.toggleDevices}><FontAwesomeIcon className="icon" icon="digital-tachograph" /></a><br/>
               <a onClick={this.toggleCustomers}><FontAwesomeIcon className="icon" icon="user-friends" /></a><br/>
+              <a onClick={this.toggleTransactions}><FontAwesomeIcon className="icon" icon="user-friends" /></a><br/>
               <div style={{padding:"100px"}}></div>
             </div>
           }
@@ -79,6 +96,7 @@ class Navbar extends Component{
         {this.state.services && <Services/>}
         {this.state.customers && <Customers/>}
         {this.state.devices && <Devices/>}
+        {this.state.transactions && <Transactions/>}
       </div>
     );
   }
