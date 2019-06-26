@@ -6,7 +6,7 @@ const serviceRoutes = require('./routers/service-routes');
 const deviceRoutes = require('./routers/device-routes');
 const entryRoutes = require('./routers/entry-routes');
 const transactionRoutes = require('./routers/transaction-routes');
-
+const accountRoutes = require('./routers/account-routes');
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use('/services', serviceRoutes);
 app.use('/devices', deviceRoutes);
 app.use('/entries', entryRoutes);
 app.use('/transactions', transactionRoutes);
-
+app.use('/accounts',accountRoutes);
 
 
 app.get('/', (req,res) => {

@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       this.state={
         showPopup:false, debitInput:[], creditInput:[],
         d_desc: '', d_amount: '', d_type: '', c_desc: '', c_amount: '', c_type: '', date:'', err:'', chkbox:false,
-        entries:[], transactions:[]
+        entries:[], transactions:[],accounts:[]
       };
     }
 
@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     componentDidMount(){
       this.getEntries();
       this.getTransactions();
+      this.getAccounts();
     }
 
     getEntries = _ =>{
@@ -26,8 +27,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
        })
       .then(fa_Entry => {
         
-          fa_Entry.trans_date = "dfd";
-          console.log(fa_Entry);
                   
           this.setState({ entries: fa_Entry })
        })
@@ -37,15 +36,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     getTransactions = _ =>{
         fetch('http://localhost:4000/transactions')
         .then(res => {
-          console.log(res);
           return res.json()
        })
       .then(fa_transactions => {
-          console.log(fa_transactions);
           this.setState({ transactions: fa_transactions })
        })
         .catch(err => console.error(err));
     };
+
+    getAccounts = _ =>{
+      fetch('http://localhost:4000/accounts')
+      .then(res => {
+        return res.json()
+     })
+    .then(fa_accounts => {
+        this.setState({ accounts: fa_accounts })
+     })
+      .catch(err => console.error(err));
+  };
+
 
     addEntry = entry =>
     {
@@ -170,6 +179,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       rows.splice(index,1);
     };
 
+    transDate = date => {
+       var t_date =new Date(date);
+       console.log(t_date);
+       
+      return t_date.getDate()+"/"+t_date.getMonth()+"/"+t_date.getFullYear();
+
+    };
     render(){
       return(
       <div id="GJ">
@@ -191,7 +207,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           {
             this.state.entries.map((item, i) => (
             <tr key={i}>
-              <td>{item.trans_date}</td>
+            
+              <td>{this.transDate(item.trans_date)}</td>
               <td>{item.trans_type}</td>
               <td>{item.account_name}</td>
               <td>{item.amount}</td>
@@ -253,11 +270,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                   <td><input type="number" name="d_amount" value={this.state.d_amount} onChange={e => this.change(e)}/></td>
                   <select name="d_type" value={this.state.d_type} onChange={e => this.change(e)}>
                     <option>Select</option>
-                    <option>Asset</option>
-                    <option>Liability</option>
-                    <option>Revenue</option>
-                    <option>Expanse</option>
-                    <option>Owner Capital</option>
+                    { this.state.accounts.map((account) => <option value={account.id} >{account.name}</option>) }
                   </select>
                   <td><FontAwesomeIcon style={{color:"blue"}} onClick={()=> this.addDebit()} icon="plus" /></td>
                 </tr>
@@ -284,11 +297,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                   <td><input type="number" name="c_amount" value={this.state.c_amount} onChange={e => this.change(e)}/></td>
                   <select name="c_type" value={this.state.c_type} onChange={e => this.change(e)}>
                     <option>Select</option>
-                    <option>Asset</option>
-                    <option>Liability</option>
-                    <option>Revenue</option>
-                    <option>Expanse</option>
-                    <option>Owner Capital</option>
+                    { this.state.accounts.map((account) => <option value={account.id} >{account.name}</option>) }
                   </select>
                   <td><FontAwesomeIcon style={{color:"blue"}} onClick={()=> this.addCredit()} icon="plus" /></td>
                 </tr>
