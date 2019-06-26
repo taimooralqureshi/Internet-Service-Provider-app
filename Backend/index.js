@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/customers', customerRoutes);
 app.use('/services', serviceRoutes);
 app.use('/devices', deviceRoutes);
-app.use('/entrys', entryRoutes);
+app.use('/entries', entryRoutes);
 app.use('/transactions', transactionRoutes);
 
 

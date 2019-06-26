@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const connection = require('./../db');
-const TRANSACTION_QUERY = "SELECT * FROM fa_transaction";
+const TRANSACTION_QUERY = "SELECT * FROM fa_Transaction";
 
 router.get('/', (req,res) => {
     connection.query(TRANSACTION_QUERY, (err, result) => {
@@ -25,7 +25,7 @@ router.get('/:id', function (req, res) {
 router.post('/', (req, res) => {
     let trans = req.body;
 
-    connection.query("Insert into fa_transaction set ?; ", trans, (err, result) => {
+    connection.query("Insert into fa_Transaction set ?; ", trans, (err, result) => {
         if (err) throw err;
         else
         {
@@ -40,7 +40,7 @@ router.post('/', (req, res) => {
 router.put('/:id', (request, response) => {
     const id = request.params.id;
 
-    connection.query('UPDATE fa_transaction SET ? WHERE id = ?', [request.body, id], (error, result) => {
+    connection.query('UPDATE fa_Transaction SET ? WHERE id = ?', [request.body, id], (error, result) => {
         if (error) throw error;
 
         response.send('Transaction updated successfully.');
@@ -51,7 +51,7 @@ router.put('/:id', (request, response) => {
 router.delete('/:id', (request, response) => {
     const id = request.params.id;
 
-    connection.query('DELETE FROM fa_transaction WHERE id = ?', id, (error, result) => {
+    connection.query('DELETE FROM fa_Transaction WHERE id = ?', id, (error, result) => {
         if (error) throw error;
 
         response.send('Transaction deleted.');

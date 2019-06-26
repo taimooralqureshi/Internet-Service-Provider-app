@@ -379,32 +379,8 @@ DELIMITER ;
 
 call customers_data();
 
-/*
-SELECT 
-    c.id,
-    c.name,
-    c.contact,
-    c.address,
-    c.status,
-    s.service AS s_name,
-    s.validity AS s_validity,
-    s.data AS s_volume,
-    s.speed AS s_speed,
-    s.price AS s_price,
-    s.type AS s_type,
-    d.device AS d_name,
-    d.description AS d_description,
-    d.price AS d_price
-FROM
-    customer c
-        LEFT OUTER JOIN
-    service s ON c.service_id = s.id
-        LEFT OUTER JOIN
-    device d ON c.device_id = d.id OR c.device_id = NULL
-GROUP BY c.id
-ORDER BY c.id;
-*/
 
+drop table if exists fa_Cash;
 CREATE TABLE fa_Cash (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
@@ -414,6 +390,7 @@ CREATE TABLE fa_Cash (
 
 INSERT into fa_Cash (type, amount, date) values ("Debit", 1000, "2019/05/15");
 
+drop table if exists fa_AP;
 CREATE TABLE fa_AP (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
@@ -421,6 +398,7 @@ CREATE TABLE fa_AP (
     date date
 );
 
+drop table if exists fa_AR;
 CREATE TABLE fa_AR (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
@@ -435,6 +413,7 @@ CREATE TABLE fa_Rev (
     date date
 );
 
+drop table if exists fa_Exp;
 CREATE TABLE fa_Exp (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
@@ -442,6 +421,8 @@ CREATE TABLE fa_Exp (
     date date
 );
 
+
+drop table if exists fa_OW;
 CREATE TABLE fa_OW (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
@@ -449,6 +430,8 @@ CREATE TABLE fa_OW (
     date date
 );
 
+
+drop table if exists fa_OC;
 CREATE TABLE fa_OC (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('Debit', 'Credit'),
@@ -458,14 +441,14 @@ CREATE TABLE fa_OC (
 
 insert into fa_OC (type, amount, date) values ("Credit", 1000, "2019/05/15");
 
-drop table if exists fa_account;
-create table fa_account(
+drop table if exists fa_Account;
+create table fa_Account(
 	id int not null primary key auto_increment,
     name varchar(50) not null unique key,
     type ENUM('Cash', 'Asset', 'Liability', 'OC', 'OW', 'Revenue', 'Expense')
 );
 
-insert into fa_account(name, type) values 
+insert into fa_Account(name, type) values 
 ("Cash", "Cash"),
 ("AP", "Liability"),
 ("AR", "Asset"),
@@ -475,39 +458,66 @@ insert into fa_account(name, type) values
 SELECT 
     *
 FROM
-    fa_account;
+    fa_Account;
 
-CREATE TABLE fa_transaction (
+CREATE TABLE fa_Transaction (
     id INT PRIMARY KEY AUTO_INCREMENT,
     date DATE,
     trans_type ENUM('Normal', 'Closing', 'Adjustment')
 );
 
+drop table if exists fa_Entry;
 CREATE TABLE fa_Entry (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    entry_type ENUM('Debit', 'Credit'),
+    type ENUM('Debit', 'Credit'),
     amount INT UNSIGNED NOT NULL,
     account_name VARCHAR(50) NOT NULL,
     trans_id INT NOT NULL,
     FOREIGN KEY (trans_id)
-        REFERENCES fa_transaction (id)
+        REFERENCES fa_Transaction (id)
         ON DELETE CASCADE,
     FOREIGN KEY (account_name)
-        REFERENCES fa_account (name)
+        REFERENCES fa_Account (name)
         ON DELETE CASCADE
 );
 
-insert into fa_transaction (id, date, trans_type) values
+insert into fa_Transaction (id, date, trans_type) values
 (1, "2019/05/15", "Normal");
 
-insert into fa_Entry (entry_type,amount,account_name,trans_id) values
+insert into fa_Entry (type,amount,account_name,trans_id) values
 ("Debit", 1000, "Cash", 1),
 ("Credit", 1000, "OC", 1);
+
+select * from fa_Entry;
+
+drop procedure if exists entries_data;
+
+DELIMITER $$
+CREATE PROCEDURE entries_data()
+BEGIN        
+
+SELECT 
+    e.*,
+    t.date as trans_date,
+    t.trans_type as trans_type,
+    a.type as account_type
+FROM
+    fa_Entry e
+        LEFT OUTER JOIN
+    fa_Transaction t ON e.trans_id = t.id
+        LEFT OUTER JOIN
+    fa_Account a ON e.account_name = a.name
+ORDER BY e.type, t.id ;
+
+END$$ 
+DELIMITER ;
+
+call entries_data();
 
 drop procedure if exists entry_data;
 
 DELIMITER $$
-CREATE PROCEDURE entry_data()
+CREATE PROCEDURE entry_data(id int)
 BEGIN        
 
 SELECT 
@@ -518,12 +528,13 @@ SELECT
 FROM
     fa_Entry e
         LEFT OUTER JOIN
-    fa_transaction t ON e.trans_id = t.id
+    fa_Transaction t ON e.trans_id = t.id
         LEFT OUTER JOIN
-    fa_account a ON e.account_name = a.name
-ORDER BY t.id;
-
+    fa_Account a ON e.account_name = a.name
+	where e.id = id;
+		
 END$$ 
 DELIMITER ;
 
-call entry_data();
+call entry_data(1);
+

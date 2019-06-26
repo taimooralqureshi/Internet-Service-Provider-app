@@ -1,25 +1,13 @@
 const router = require('express').Router();
-const connection = require('./../db');
+const connection = require('../db');
 
 router.get('/', (req,res) => {
-    connection.query('CALL entry_data()', (err, result) => {
+    connection.query('CALL entries_data()', (err, result) => {
         if (err) throw err;
         else
           return res.json(result[0])
     });
 });
-
-router.get('/:id', function (req, res) {
-    let id = req.params.id;
-
-    connection.query("call entry_data(?)",id, (err, result) => {
-        if (err) throw err;
-        else
-          return res.json(result[0])
-    });
-
-});
-
 
 router.get('/raw', (req,res) => {
     connection.query('select * from fa_Entry', (err, result) => {
@@ -39,6 +27,20 @@ router.get('/raw/:id', function (req, res) {
     });
 
 });
+
+
+router.get('/:id', function (req, res) {
+    let id = req.params.id;
+
+    connection.query("call entry_data(?)",id, (err, result) => {
+        if (err) throw err;
+        else
+          return res.json(result[0][0])
+    });
+
+});
+
+
 
 
 
@@ -71,7 +73,7 @@ router.put('/:id', (request, response) => {
 router.delete('/:id', (request, response) => {
     const id = request.params.id;
 
-    connection.query('DELETE FROM fa_Entry WHERE trans_id = ?', id, (error, result) => {
+    connection.query('DELETE FROM fa_Entry WHERE id = ?', id, (error, result) => {
         if (error) throw error;
 
         response.send('Entry deleted.');

@@ -20,18 +20,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     }
 
     getEntries = _ =>{
-        fetch('http://localhost:4000/fa_Entry')
+        fetch('http://localhost:4000/entries')
         .then(res => {
           return res.json()
        })
       .then(fa_Entry => {
+        
+          fa_Entry.trans_date = "dfd";
+          console.log(fa_Entry);
+                  
           this.setState({ entries: fa_Entry })
        })
         .catch(err => console.error(err));
     };
 
     getTransactions = _ =>{
-        fetch('http://localhost:4000/fa_transaction')
+        fetch('http://localhost:4000/transactions')
         .then(res => {
           console.log(res);
           return res.json()
@@ -45,7 +49,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
     addEntry = entry =>
     {
-      fetch('http://localhost:4000/fa_Entry/',{
+      fetch('http://localhost:4000/entries/',{
         method : 'POST',
         headers: {'Content-Type':'application/json'},
         body : JSON.stringify(entry)
@@ -61,7 +65,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     {
       console.log(trans);
 
-      fetch('http://localhost:4000/fa_transaction/',{
+      fetch('http://localhost:4000/transactions/',{
         method : 'POST',
         headers: {'Content-Type':'application/json'},
         body : JSON.stringify(trans)
@@ -75,7 +79,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     };
 
     deleteEntry = id =>{
-      fetch('http://localhost:4000/fa_Entry/'+id,{method : 'DELETE'})
+      fetch('http://localhost:4000/entries/'+id,{method : 'DELETE'})
       .then(res => {
         this.getEntries();
         return res.json();
@@ -177,6 +181,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           <thead style={{backgroundColor:"white", borderBottom:"3px solid #ec9841"}}>
             <tr>
               <th>Date</th>
+              <th>Entry</th>
               <th>General Journal</th>
               <th>Amount</th>
               <th>Delete</th>
@@ -186,8 +191,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           {
             this.state.entries.map((item, i) => (
             <tr key={i}>
-              <td>{item.t_date}</td>
-              <td>{item.description}</td>
+              <td>{item.trans_date}</td>
+              <td>{item.trans_type}</td>
+              <td>{item.account_name}</td>
               <td>{item.amount}</td>
               <td><a href="#" onClick={() =>
                 {
