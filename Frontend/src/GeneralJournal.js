@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       super(props);
       this.state={
         showPopup:false, debitInput:[], creditInput:[],
-        d_desc: '', d_amount: '', d_type: '', c_desc: '', c_amount: '', c_type: '', date:'', err:'', entry:"Normal",
+        d_desc: '', d_amount: '', c_desc: '', c_amount: '', date:'', err:'', entry:"Normal", newAccount:'', AccountType:'',
         entries:[], transactions:[], GJtable:[],accounts:[]
       };
     }
@@ -26,8 +26,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           return res.json()
        })
       .then(fa_Entry => {
-        
-                  
+
+
           this.setState({ entries: fa_Entry })
        })
         .catch(err => console.error(err));
@@ -220,7 +220,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     transDate = date => {
       var t_date =new Date(date);
       console.log(t_date);
-      
+
      return t_date.getDate()+"/"+t_date.getMonth()+"/"+t_date.getFullYear();
 
    };
@@ -313,13 +313,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             <Modal.Title>Add Transaction</Modal.Title>
           </Modal.Header>
           <Modal.Body>
+
+            <div><h5>Add Account</h5></div>
+            <label for="newAccount">Account Name:</label>
+            <input type="text" name="newAccount" value={this.state.newAccount} onChange={e => this.change(e)}/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label for="accountType">Account Type:</label>
+            <select style={{width: "150px"}} name="accountType" value={this.state.accountType} onChange={e => this.change(e)}>
+              <option>Select</option>
+              { this.state.accounts.map((account) => <option value={account.id} >{account.name}</option>) }
+            </select>
+            <Button style={{float:"right", marginRight:"60px", backgroundColor:"orange", padding: "5px 25px", border:"1px solid orange"}} variant="primary" onClick={()=> this.addAccount(this.state)}>Add</Button>
+            <hr/>
+
             <Table bordered size="sm">
               <thead  style={{color:"white", backgroundColor:"#ec9841"}}>
                 <tr>
                   <th style={{backgroundColor:"white"}}></th>
-                  <th>General Journal</th>
+                  <th>Account Name</th>
                   <th>Amount</th>
-                  <th>Type</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -333,7 +344,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                     <td style={{color:"white", backgroundColor:"#ec9841"}}>Debit</td>
                     <td>{item.description}</td>
                     <td>{item.amount}</td>
-                    <td>{item.type}</td>
                     <td><a href="#" onClick={() => { if (window.confirm('Are you sure you wish to delete this item?')) this.delete(i, this.state.debitInput) } }>Delete</a></td>
                   </tr>
                   ))
@@ -345,10 +355,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                   <td style={{color:"white", backgroundColor:"#ec9841"}}>Debit</td>
                   <td><input type="text" name="d_desc" value={this.state.d_desc} onChange={e => this.change(e)}/></td>
                   <td><input type="number" name="d_amount" value={this.state.d_amount} onChange={e => this.change(e)}/></td>
-                  <select name="d_type" value={this.state.d_type} onChange={e => this.change(e)}>
-                    <option>Select</option>
-                    { this.state.accounts.map((account) => <option value={account.id} >{account.name}</option>) }
-                  </select>
                   <td><FontAwesomeIcon style={{color:"blue"}} onClick={()=> this.addDebit()} icon="plus" /></td>
                 </tr>
                 {
@@ -360,7 +366,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                     <td style={{color:"white", backgroundColor:"#ec9841"}}>Credit</td>
                     <td>{item.description}</td>
                     <td>{item.amount}</td>
-                    <td>{item.type}</td>
                     <td><a href="#" onClick={() => { if (window.confirm('Are you sure you wish to delete this item?')) this.deleteDebit(i, this.state.creditInput) } }>Delete</a></td>
                   </tr>
                   ))
@@ -372,10 +377,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                   <td style={{color:"white", backgroundColor:"#ec9841"}}>Credit</td>
                   <td><input type="text" name="c_desc" value={this.state.c_desc} onChange={e => this.change(e)}/></td>
                   <td><input type="number" name="c_amount" value={this.state.c_amount} onChange={e => this.change(e)}/></td>
-                  <select name="c_type" value={this.state.c_type} onChange={e => this.change(e)}>
-                    <option>Select</option>
-                    { this.state.accounts.map((account) => <option value={account.id} >{account.name}</option>) }
-                  </select>
                   <td><FontAwesomeIcon style={{color:"blue"}} onClick={()=> this.addCredit()} icon="plus" /></td>
                 </tr>
               </tbody>
