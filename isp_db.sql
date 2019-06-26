@@ -425,24 +425,21 @@ CREATE TABLE fa_Entry (
 
 insert into fa_Transaction (id, date, trans_type) values
 (1, "2019/05/15", "Normal"),
-(2, "2019/05/16", "Normal"),
-(3, "2019/05/17", "Normal"),
-(4, "2019/05/18", "Normal"),
-(5, "2019/05/19", "Normal");
+(2, "2019/05/15", "Adjustment"),
+(3, "2019/05/15", "Normal"),
+(4, "2019/05/15", "Adjustment");
 
-
+select * from fa_Transaction;
 
 insert into fa_Entry (type,amount,account_name,trans_id) values
 ("Debit", 1000, "Cash", 1),
 ("Credit", 1000, "OC", 1),
-("Debit", 100, "Exp", 2),
-("Credit", 100, "Cash", 2),
-("Debit", 200, "Cash", 3),
-("Credit", 200, "Rev", 3),
-("Debit", 750, "AR", 4),
-("Credit", 750, "Rev", 4),
-("Debit", 750, "Cash", 5),
-("Credit", 750, "AR", 5);
+("Debit", 2000, "AP", 2),
+("Credit", 2000, "Cash", 2),
+("Debit", 1000, "Cash", 3),
+("Credit", 1000, "OC", 3),
+("Debit", 2000, "AP", 4),
+("Credit", 2000, "Cash", 4);
 
 select * from fa_Entry;
 
@@ -487,7 +484,8 @@ FROM
     fa_Transaction t ON e.trans_id = t.id
         LEFT OUTER JOIN
     fa_Account a ON e.account_name = a.name
-	where e.id = id;
+	where e.id = id
+ORDER BY t.id, t.id ;
 		
 END$$ 
 DELIMITER ;
