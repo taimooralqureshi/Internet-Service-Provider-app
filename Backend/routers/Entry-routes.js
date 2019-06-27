@@ -52,7 +52,7 @@ router.post('/', (req, res) => {
         if (err) throw err;
         else
         {
-            return res.send({ error: false, data: result, message: 'New entry has been created successfully.' });
+            return res.send({  data: result["insertId"] });
         }
     });
 

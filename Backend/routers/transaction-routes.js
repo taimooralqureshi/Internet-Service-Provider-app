@@ -25,11 +25,11 @@ router.get('/:id', function (req, res) {
 router.post('/', (req, res) => {
     let trans = req.body;
 
-    connection.query("Insert into fa_Transaction set ?; ", trans, (err, result) => {
+    connection.query("Insert into fa_Transaction set ?", trans, (err, result) => {
         if (err) throw err;
         else
         {
-            return res.send({ error: false, data: result, message: 'New transaction has been created successfully.' });
+            return res.json({  data: result["insertId"], message: 'New transaction has been created successfully.' });
         }
     });
 

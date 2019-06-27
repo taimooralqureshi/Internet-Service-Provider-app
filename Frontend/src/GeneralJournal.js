@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       this.state={
         showPopup:false, debitInput:[], creditInput:[],
         d_desc: '', d_amount: '', c_desc: '', c_amount: '', date:'', err:'', entry:"Normal", newAccount:'', AccountType:'',
-        entries:[], transactions:[], GJtable:[],accounts:[]
+        entries:[], transactions:[], GJtable:[],accounts:[], insertedId:''
       };
     }
 
@@ -64,7 +64,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
         body : JSON.stringify(entry)
       })
       .then(res => {
-        this.getEntries();
         return res.json();
       })
       .catch(err => console.error(err));
@@ -82,10 +81,51 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
       })
       .then(res => {
         this.getTransactions();
+        const id =  res['data'];
+      
+        this.setState({insertedId : id},()=>{
+          for(let i=0; i<this.state.debitInput.length; i++)
+          {
+            console.log("entry  "+ i);
+            var custom_entry = {
+              "type": "Debit",
+              "amount": this.state.debitInput[i].amount,
+              "account_name": this.state.debitInput[i].description,
+              "trans_id": id
+            };
+            this.addEntry(custom_entry);
+          }
+          for(let i=0; i<this.state.creditInput.length; i++)
+          {
+            console.log(id);
+            var custom_entry = {
+              "type": "Credit",
+              "amount": this.state.creditInput[i].amount,
+              "account_name": this.state.creditInput[i].description,
+              "trans_id":id
+            };
+            this.addEntry(custom_entry);
+          }
+        })
+        
+      })
+      .catch(err => console.error(err));
+      return this.state.insertedId;
+    };
+
+    addAccount = acc => {
+      fetch('http://localhost:4000/accounts/',{
+        method : 'POST',
+        headers: {'Content-Type':'application/json'},
+        body : JSON.stringify({ "name":acc.newAccount, "type" : acc.accountType})
+
+      }).then(res => {
+        this.getAccounts();
         return res.json();
       })
       .catch(err => console.error(err));
     };
+
 
     deleteEntry = id =>{
       fetch('http://localhost:4000/entries/'+id,{method : 'DELETE'})
@@ -180,28 +220,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           "date": this.state.date,
           "trans_type": this.state.entry
         }
+        
         this.addTransaction(custom_trans);
-
-        for(let i=0; i<this.state.debitInput.length; i++)
-        {
-          var custom_entry = {
-            "type": "Debit",
-            "amount": this.state.debitInput[i].amount,
-            "account_name": this.state.debitInput[i].description,
-            "trans_id": this.state.transactions[this.state.transactions.length-1].id
-          }
-          this.addEntry(custom_entry);
-        }
-        for(let i=0; i<this.state.creditInput.length; i++)
-        {
-          var custom_entry = {
-            "type": "Debit",
-            "amount": this.state.creditInput[i].amount,
-            "account_name": this.state.creditInput[i].description,
-            "trans_id": this.state.transactions[this.state.transactions.length-1].id
-          }
-          this.addEntry(custom_entry);
-        }
+       
+        
 
         this.handleClose();
       }
@@ -218,11 +240,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
     //-----------------------------------Data processing functions start--------------------------------------------------------
 
     transDate = date => {
+      if(date){
       var t_date =new Date(date);
       console.log(t_date);
 
      return t_date.getDate()+"/"+t_date.getMonth()+"/"+t_date.getFullYear();
-
+      }
+      return ;
    };
     maketable = () =>{
       let temp=this.state.entries;
@@ -282,7 +306,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
           {
             this.state.GJtable.map((item, i) => (
               <tr key={i}>
-                <td>{item.date}</td>
+                <td>{ this.transDate(item.date)}</td>
                 <td>{item.entry}</td>
                 <td>
                   <div>{this.state.GJtable[i].debit.map((items, j) => (items))}</div>
@@ -320,7 +344,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             <label for="accountType">Account Type:</label>
             <select style={{width: "150px"}} name="accountType" value={this.state.accountType} onChange={e => this.change(e)}>
               <option>Select</option>
-              { this.state.accounts.map((account) => <option value={account.id} >{account.name}</option>) }
+               <option value="Cash" >Cash</option>
+               <option value="Asset" >Asset</option>
+               <option value="AR" >AR</option>
+               <option value="Owner Capital" >Owner Capital</option>
+               <option value="Onwer Withdraw" >Onwer Withdraw</option>
+               <option value="Revenue" >Revenue</option>
+               <option value="Expense" >Expense</option>
             </select>
             <Button style={{float:"right", marginRight:"60px", backgroundColor:"orange", padding: "5px 25px", border:"1px solid orange"}} variant="primary" onClick={()=> this.addAccount(this.state)}>Add</Button>
             <hr/>
@@ -329,7 +359,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
               <thead  style={{color:"white", backgroundColor:"#ec9841"}}>
                 <tr>
                   <th style={{backgroundColor:"white"}}></th>
-                  <th>Account Name</th>
+                  <th>General Journal</th>
                   <th>Amount</th>
                   <th>Action</th>
                 </tr>
@@ -353,7 +383,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 }
                 <tr>
                   <td style={{color:"white", backgroundColor:"#ec9841"}}>Debit</td>
-                  <td><input type="text" name="d_desc" value={this.state.d_desc} onChange={e => this.change(e)}/></td>
+                  <td>
+                    {/* <input type="text" name="d_desc" value={this.state.d_desc} onChange={e => this.change(e)}/> */}
+                      <select style={{width: "150px"}} name="d_desc" value={this.state.d_desc} onChange={e => this.change(e)}>
+                       <option>Select</option>
+                        { this.state.accounts.map((account) => <option value={account.name} >{account.name}</option>) }
+                      </select>
+                    </td>
                   <td><input type="number" name="d_amount" value={this.state.d_amount} onChange={e => this.change(e)}/></td>
                   <td><FontAwesomeIcon style={{color:"blue"}} onClick={()=> this.addDebit()} icon="plus" /></td>
                 </tr>
@@ -375,7 +411,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
                 }
                 <tr>
                   <td style={{color:"white", backgroundColor:"#ec9841"}}>Credit</td>
-                  <td><input type="text" name="c_desc" value={this.state.c_desc} onChange={e => this.change(e)}/></td>
+
+                  <td>
+                    {/* <input type="text" name="c_desc" value={this.state.c_desc} onChange={e => this.change(e)}/> */}
+                    <select style={{width: "150px"}} name="c_desc" value={this.state.c_desc} onChange={e => this.change(e)}>
+                     <option>Select</option>
+                      { this.state.accounts.map((account) => <option value={account.name} >{account.name}</option>) }
+                    </select>  
+                  </td>
                   <td><input type="number" name="c_amount" value={this.state.c_amount} onChange={e => this.change(e)}/></td>
                   <td><FontAwesomeIcon style={{color:"blue"}} onClick={()=> this.addCredit()} icon="plus" /></td>
                 </tr>

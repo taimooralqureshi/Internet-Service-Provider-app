@@ -9,7 +9,18 @@ router.get('/', (req,res) => {
     });
 });
 
+router.post('/', (req,res) => {
+    let account = req.body;
 
+    connection.query("Insert into fa_Account set ?", account, (err, result) => {
+        if (err) throw err;
+        else
+        {
+            return res.json({  data: result["insertId"], message: 'New Account has been created successfully.' });
+        }
+    });
+
+});
 router.get('/:account', (req,res) => {
     let account_name = req.params.account;
     
